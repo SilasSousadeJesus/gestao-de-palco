@@ -18,6 +18,7 @@ export type TimeBlock = {
   title: string;
   durationSeconds: number;
   actualSeconds: number | null;
+  finishedAt: number | null;
   position: number;
   isSequential: boolean;
 };
@@ -26,7 +27,7 @@ function listBlocks(database: Database.Database, eventId: string) {
   return database
     .prepare(
       `select id, event_id as eventId, title, duration_seconds as durationSeconds,
-        actual_seconds as actualSeconds, position, is_sequential as isSequential from time_blocks
+        actual_seconds as actualSeconds, finished_at as finishedAt, position, is_sequential as isSequential from time_blocks
        where event_id = ? order by position, created_at`,
     )
     .all(eventId) as TimeBlock[];
@@ -48,6 +49,8 @@ export function getEvent(database: Database.Database, eventId: string) {
   return event ? { ...event, blocks: listBlocks(database, eventId) } : null;
 }
 
+const EVENT_TITLE_MAX_LENGTH = 20;
+
 export function createEvent(
   database: Database.Database,
   input: { title: string; scheduledAt?: number; displayMode?: "timer" | "messages" },
@@ -56,6 +59,7 @@ export function createEvent(
   const now = Date.now();
   const title = input.title.trim();
   if (!title) throw new Error("Informe o nome do evento.");
+  if (title.length > EVENT_TITLE_MAX_LENGTH) throw new Error(`Nome do evento deve ter no maximo ${EVENT_TITLE_MAX_LENGTH} caracteres.`);
   database.transaction(() => {
     database.prepare(`insert into events (id, title, scheduled_at, display_mode, status, created_at, updated_at) values (?, ?, ?, ?, 'draft', ?, ?)`)
       .run(id, title, input.scheduledAt ?? now, input.displayMode ?? "timer", now, now);
@@ -73,6 +77,7 @@ export function updateEventStatus(database: Database.Database, eventId: string, 
 export function updateEventTitle(database: Database.Database, eventId: string, title: string) {
   const trimmed = title.trim();
   if (!trimmed) throw new Error("Informe o nome do evento.");
+  if (trimmed.length > EVENT_TITLE_MAX_LENGTH) throw new Error(`Nome do evento deve ter no maximo ${EVENT_TITLE_MAX_LENGTH} caracteres.`);
   const result = database.prepare("update events set title = ?, updated_at = ? where id = ?").run(trimmed, Date.now(), eventId);
   return result.changes ? getEvent(database, eventId) : null;
 }
@@ -88,7 +93,7 @@ export function createBlock(database: Database.Database, eventId: string, input:
   if (!getEvent(database, eventId)) return null;
   const position = (database.prepare("select count(*) as count from time_blocks where event_id = ?").get(eventId) as { count: number }).count;
   const now = Date.now();
-  const block: TimeBlock = { id: randomUUID(), eventId, title, durationSeconds: input.durationSeconds, actualSeconds: null, position, isSequential: false };
+  const block: TimeBlock = { id: randomUUID(), eventId, title, durationSeconds: input.durationSeconds, actualSeconds: null, finishedAt: null, position, isSequential: false };
   database.prepare(`insert into time_blocks (id, event_id, title, duration_seconds, position, is_sequential, created_at, updated_at) values (?, ?, ?, ?, ?, 0, ?, ?)`)
     .run(block.id, eventId, title, block.durationSeconds, position, now, now);
   return block;

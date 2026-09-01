@@ -29,7 +29,7 @@ Este arquivo e preenchido e ajustado pelo usuario. Ele complementa o que o agent
 | Idioma de comunicacao                   | Portugues do Brasil              |
 | Antes de editar                         | Propor plano e esperar aprovacao |
 | Antes de migrar banco ou tocar producao | Pedir autorizacao explicita      |
-| Formato de commit, se houver            | PENDENTE                         |
+| Formato de commit, se houver            | Sempre em portugues. Apos qualquer alteracao em arquivos, sugerir um mini texto de commit em portugues antes de committar (o commit em si so acontece quando o usuario pedir). |
 | Definicao de pronto                     | PENDENTE                         |
 
 ## Decisoes humanas

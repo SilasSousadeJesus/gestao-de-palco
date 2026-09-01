@@ -1,6 +1,6 @@
 import type Database from "better-sqlite3";
 
-export const stageCommandTypes = ["start", "pause", "resume", "clear", "show_message", "clear_message"] as const;
+export const stageCommandTypes = ["start", "pause", "resume", "clear", "finish", "show_message", "clear_message"] as const;
 
 export type StageCommandType = (typeof stageCommandTypes)[number];
 
@@ -152,6 +152,22 @@ function nextSnapshot(
         pausedElapsedSeconds: null,
         updatedAt: now,
       };
+    case "finish":
+      if (!command.blockId) {
+        throw new StageStateError("invalid_state", "Selecione um bloco para finalizar.");
+      }
+      if (current.activeBlockId === command.blockId) {
+        return {
+          eventElapsedSeconds: accumulated,
+          activeBlockId: null,
+          mode: "idle",
+          startedAt: null,
+          pausedAt: null,
+          pausedElapsedSeconds: null,
+          updatedAt: now,
+        };
+      }
+      return { updatedAt: now };
     case "show_message":
       if (!command.message?.trim()) throw new StageStateError("invalid_state", "Informe uma mensagem.");
       return { activeBlockId: current.activeBlockId, activeMessageContent: command.message.trim(), messageExpiresAt: command.durationSeconds ? now + command.durationSeconds * 1000 : null, eventElapsedSeconds: current.eventElapsedSeconds, mode: current.mode, startedAt: current.startedAt, pausedAt: current.pausedAt, pausedElapsedSeconds: current.pausedElapsedSeconds, updatedAt: now };
@@ -199,10 +215,13 @@ export function applyStageCommand(
 
     if (command.blockId) {
       const block = database
-        .prepare("select 1 from time_blocks where id = ? and event_id = ?")
-        .get(command.blockId, eventId);
+        .prepare("select finished_at as finishedAt from time_blocks where id = ? and event_id = ?")
+        .get(command.blockId, eventId) as { finishedAt: number | null } | undefined;
       if (!block) {
         throw new StageStateError("invalid_state", "O bloco nao pertence a este evento.");
+      }
+      if (block.finishedAt !== null && (command.type === "start" || command.type === "finish")) {
+        throw new StageStateError("invalid_state", "O bloco ja foi finalizado.");
       }
     }
 
@@ -221,10 +240,12 @@ export function applyStageCommand(
         .prepare("update time_blocks set actual_seconds = null, updated_at = ? where event_id = ?")
         .run(now, eventId);
     } else if (
-      (command.type === "start" || command.type === "clear") &&
       current.activeBlockId &&
       current.mode === "running" &&
-      current.startedAt !== null
+      current.startedAt !== null &&
+      (command.type === "start" ||
+        command.type === "clear" ||
+        (command.type === "finish" && command.blockId === current.activeBlockId))
     ) {
       const ranSeconds = Math.max(0, Math.floor((now - current.startedAt) / 1000));
       if (ranSeconds > 0) {
@@ -235,6 +256,12 @@ export function applyStageCommand(
           )
           .run(ranSeconds, now, current.activeBlockId, eventId);
       }
+    }
+
+    if (command.type === "finish" && command.blockId) {
+      database
+        .prepare("update time_blocks set finished_at = ?, updated_at = ? where id = ? and event_id = ?")
+        .run(now, now, command.blockId, eventId);
     }
 
     const changed = nextSnapshot(current, command, now);

@@ -6,7 +6,7 @@ import { confirmDelete } from "@/lib/confirm-dialog";
 import { StagePresentation } from "@/features/stage/stage-presentation";
 import { useStageSnapshot } from "@/features/stage/use-stage-snapshot";
 
-type Block = { id: string; title: string; durationSeconds: number; actualSeconds: number | null; position: number };
+type Block = { id: string; title: string; durationSeconds: number; actualSeconds: number | null; finishedAt: number | null; position: number };
 type EventItem = { id: string; title: string; status: string; plannedSeconds: number; blocks?: Block[] };
 
 function Icon({ children, filled = false }: { children: ReactNode; filled?: boolean }) {
@@ -36,6 +36,12 @@ const IconPlay = () => <Icon filled><path d="M6.5 4.3v11.4c0 .6.7 1 1.2.7l8.8-5.
 const IconStop = () => <Icon filled><rect x="5.5" y="5.5" width="9" height="9" rx="1.5" /></Icon>;
 const IconCheck = () => <Icon><path d="M4 10.3l3.6 3.7L16 5" /></Icon>;
 const IconX = () => <Icon><path d="M5 5l10 10M15 5L5 15" /></Icon>;
+const IconFinish = () => (
+  <Icon>
+    <path d="M5 17V3" />
+    <path d="M5 4h8l-2.5 2.5L13 9H5" />
+  </Icon>
+);
 
 const minutes = (seconds: number) => `${Math.floor(seconds / 60)} min`;
 const elapsedTime = (seconds: number) =>
@@ -48,11 +54,24 @@ const formatDelay = (seconds: number) => {
   const totalMinutes = Math.round(seconds / 60);
   return `${totalMinutes > 0 ? "+" : ""}${totalMinutes} min`;
 };
+const delayClass = (seconds: number) => (seconds < 0 ? "is-late" : seconds > 0 ? "is-early" : "");
+
+const EVENT_TITLE_LIMIT = 20;
+const makeLimitedChangeHandler = (limit: number, setValue: (value: string) => void, setLimitHit: (hit: boolean) => void) => (value: string) => {
+  if (value.length > limit) {
+    setValue(value.slice(0, limit));
+    setLimitHit(true);
+  } else {
+    setValue(value);
+    setLimitHit(false);
+  }
+};
 
 export function ManagementClient() {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [active, setActive] = useState<EventItem | null>(null);
   const [title, setTitle] = useState("");
+  const [titleLimitHit, setTitleLimitHit] = useState(false);
   const [blockTitle, setBlockTitle] = useState("");
   const [blockMinutes, setBlockMinutes] = useState("30");
   const [messageText, setMessageText] = useState("");
@@ -60,6 +79,7 @@ export function ManagementClient() {
   const [clock, setClock] = useState(() => Date.now());
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
   const [editingEventTitle, setEditingEventTitle] = useState("");
+  const [editingEventTitleLimitHit, setEditingEventTitleLimitHit] = useState(false);
   const [editingBlockId, setEditingBlockId] = useState<string | null>(null);
   const [editingBlockTitle, setEditingBlockTitle] = useState("");
   const [editingBlockMinutes, setEditingBlockMinutes] = useState("");
@@ -97,11 +117,16 @@ export function ManagementClient() {
     ).json()) as EventItem;
     window.localStorage.setItem("gestao-de-palco.evento-ativo", created.id);
     setTitle("");
+    setTitleLimitHit(false);
     await loadEvents();
     setActive(created);
   };
 
-  const renameEventStart = (item: EventItem) => { setEditingEventId(item.id); setEditingEventTitle(item.title); };
+  const renameEventStart = (item: EventItem) => {
+    setEditingEventId(item.id);
+    setEditingEventTitle(item.title);
+    setEditingEventTitleLimitHit(false);
+  };
   const renameEventCancel = () => setEditingEventId(null);
   const renameEventSave = async (id: string) => {
     if (!editingEventTitle.trim()) return;
@@ -175,7 +200,7 @@ export function ManagementClient() {
     await loadEvents();
   };
 
-  const command = async (type: "start" | "clear", blockId?: string, resetElapsed?: boolean) => {
+  const command = async (type: "start" | "clear" | "finish", blockId?: string, resetElapsed?: boolean) => {
     if (!active || !snapshot) return;
     const response = await fetch(`/api/events/${active.id}/stage/commands`, {
       method: "POST",
@@ -225,15 +250,9 @@ export function ManagementClient() {
     if (response.ok) setSnapshot(await response.json());
   };
 
-  const onMessageTextChange = (value: string) => {
-    if (value.length > 50) {
-      setMessageText(value.slice(0, 50));
-      setMessageLimitHit(true);
-    } else {
-      setMessageText(value);
-      setMessageLimitHit(false);
-    }
-  };
+  const onMessageTextChange = makeLimitedChangeHandler(50, setMessageText, setMessageLimitHit);
+  const onTitleChange = makeLimitedChangeHandler(EVENT_TITLE_LIMIT, setTitle, setTitleLimitHit);
+  const onEditingEventTitleChange = makeLimitedChangeHandler(EVENT_TITLE_LIMIT, setEditingEventTitle, setEditingEventTitleLimitHit);
 
   const currentBlock = active?.blocks?.find((block) => block.id === snapshot?.activeBlockId);
   const elapsed = snapshot
@@ -263,7 +282,8 @@ export function ManagementClient() {
         <aside className="event-panel">
           <h2>Eventos</h2>
           <form onSubmit={createEvent}>
-            <input value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Ex.: Culto 01 - Domingo" />
+            <input value={title} onChange={(event) => onTitleChange(event.target.value)} placeholder="Ex.: Culto 01 - Domingo" />
+            {titleLimitHit && <small className="message-limit-warning">Limite de 20 caracteres atingido.</small>}
             <button>Criar evento</button>
           </form>
           <div className="event-list">
@@ -274,9 +294,10 @@ export function ManagementClient() {
                   className="event-edit-form"
                   onSubmit={(event) => { event.preventDefault(); void renameEventSave(item.id); }}
                 >
-                  <input autoFocus value={editingEventTitle} onChange={(event) => setEditingEventTitle(event.target.value)} />
+                  <input autoFocus value={editingEventTitle} onChange={(event) => onEditingEventTitleChange(event.target.value)} />
                   <button type="submit" className="icon-button" title="Salvar" aria-label="Salvar nome"><IconCheck /></button>
                   <button type="button" className="icon-button" title="Cancelar" aria-label="Cancelar edicao" onClick={renameEventCancel}><IconX /></button>
+                  {editingEventTitleLimitHit && <small className="message-limit-warning event-edit-warning">Limite de 20 caracteres atingido.</small>}
                 </form>
               ) : (
                 <div className={`event-row ${active?.id === item.id ? "selected" : ""}`} key={item.id}>
@@ -329,16 +350,19 @@ export function ManagementClient() {
                       <button type="button" className="icon-button" title="Cancelar" aria-label="Cancelar edicao" onClick={editBlockCancel}><IconX /></button>
                     </form>
                   ) : (
-                    <article key={block.id}>
+                    <article key={block.id} className={block.finishedAt ? "is-finished" : ""}>
                       <div>
                         <b>{block.title}</b>
-                        <small>{minutes(block.durationSeconds)}</small>
+                        <small>{minutes(block.durationSeconds)}{block.finishedAt ? " · Finalizado" : ""}</small>
                       </div>
                       <div className="block-actions">
-                        {isActiveBlock ? (
+                        {block.finishedAt ? null : isActiveBlock ? (
                           <button className="icon-button" title="Parar" aria-label="Parar bloco" onClick={() => void command("clear")}><IconStop /></button>
                         ) : (
                           <button className="icon-button" title="Iniciar" aria-label="Iniciar bloco" onClick={() => void command("start", block.id)}><IconPlay /></button>
+                        )}
+                        {block.finishedAt ? null : (
+                          <button className="icon-button icon-finish" title="Finalizar" aria-label="Finalizar bloco" onClick={() => void command("finish", block.id)}><IconFinish /></button>
                         )}
                         <button className="icon-button" title="Editar" aria-label="Editar bloco" onClick={() => editBlockStart(block)}><IconEdit /></button>
                         <button className="icon-button icon-delete" title="Excluir" aria-label="Excluir bloco" onClick={() => void removeBlock(block)}><IconTrash /></button>
@@ -376,7 +400,7 @@ export function ManagementClient() {
                   <tr key={block.id}>
                     <td>{block.title}</td>
                     <td>{minutes(block.durationSeconds)}</td>
-                    <td className={hasRun && delaySeconds < 0 ? "is-late" : ""}>{hasRun ? formatDelay(delaySeconds) : "—"}</td>
+                    <td className={hasRun ? delayClass(delaySeconds) : ""}>{hasRun ? formatDelay(delaySeconds) : "—"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -384,11 +408,11 @@ export function ManagementClient() {
                 <tr>
                   <td>Total</td>
                   <td>{minutes(active.plannedSeconds)}</td>
-                  <td className={totalDelaySeconds < 0 ? "is-late" : ""}>{formatDelay(totalDelaySeconds)}</td>
+                  <td className={delayClass(totalDelaySeconds)}>{formatDelay(totalDelaySeconds)}</td>
                 </tr>
                 <tr>
                   <td colSpan={2}>Planejado − Decorrido</td>
-                  <td className={budgetSeconds < 0 ? "is-late" : ""}>{formatDelay(budgetSeconds)}</td>
+                  <td className={delayClass(budgetSeconds)}>{formatDelay(budgetSeconds)}</td>
                 </tr>
               </tfoot>
             </table>

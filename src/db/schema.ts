@@ -24,6 +24,7 @@ export const timeBlocks = sqliteTable("time_blocks", {
   title: text("title").notNull(),
   durationSeconds: integer("duration_seconds").notNull(),
   actualSeconds: integer("actual_seconds"),
+  finishedAt: integer("finished_at", { mode: "timestamp_ms" }),
   position: integer("position").notNull(),
   isSequential: integer("is_sequential", { mode: "boolean" })
     .notNull()

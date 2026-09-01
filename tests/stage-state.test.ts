@@ -246,3 +246,54 @@ test("trocar de bloco acumula actual_seconds do bloco anterior; limpar palco com
   assert.equal(actualSecondsOf("bloco-2"), null);
   assert.equal(finalSnapshot.eventElapsedSeconds, 0);
 });
+
+test("finalizar um bloco para o cronometro, marca finished_at e bloqueia iniciar ou finalizar de novo", () => {
+  const database = createDatabase();
+
+  const finishedAtOf = (blockId: string) =>
+    (database.prepare("select finished_at as finishedAt from time_blocks where id = ?").get(blockId) as { finishedAt: number | null })
+      .finishedAt;
+
+  applyStageCommand(
+    database,
+    "evento",
+    { blockId: "bloco", commandId: "inicio", expectedVersion: 0, type: "start" },
+    0,
+  );
+
+  const finished = applyStageCommand(
+    database,
+    "evento",
+    { blockId: "bloco", commandId: "finalizar", expectedVersion: 1, type: "finish" },
+    8_000,
+  );
+
+  assert.equal(finished.mode, "idle");
+  assert.equal(finished.activeBlockId, null);
+  assert.equal(finished.eventElapsedSeconds, 8);
+  assert.equal(finishedAtOf("bloco"), 8_000);
+
+  assert.throws(
+    () =>
+      applyStageCommand(
+        database,
+        "evento",
+        { blockId: "bloco", commandId: "reiniciar", expectedVersion: 2, type: "start" },
+        9_000,
+      ),
+    (error: unknown) => error instanceof StageStateError && error.code === "invalid_state",
+  );
+
+  assert.throws(
+    () =>
+      applyStageCommand(
+        database,
+        "evento",
+        { blockId: "bloco", commandId: "finalizar-de-novo", expectedVersion: 2, type: "finish" },
+        9_000,
+      ),
+    (error: unknown) => error instanceof StageStateError && error.code === "invalid_state",
+  );
+
+  assert.equal(readStageSnapshot(database, "evento").version, 2);
+});

@@ -36,6 +36,13 @@
       "when": 1788302504575,
       "tag": "0004_woozy_silver_centurion",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1788304821050,
+      "tag": "0005_thick_blur",
+      "breakpoints": true
     }
   ]
 }
