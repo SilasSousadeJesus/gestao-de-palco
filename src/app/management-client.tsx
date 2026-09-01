@@ -388,13 +388,18 @@ export function ManagementClient() {
             <p>Crie ou selecione um evento para iniciar a preparacao.</p>
           )}
         </section>
+        <section className="preview-panel">
+          <p className="eyebrow">PREVIEW AO VIVO</p>
+          <StagePresentation snapshot={snapshot} block={currentBlock} />
+          <small>Versao {snapshot?.version ?? "-"} · {connection}</small>
+        </section>
         <aside className="report-panel">
           <p className="eyebrow">RELATORIO DE BLOCOS</p>
           {active ? (
             <div className="report-table-wrap">
               <table>
                 <thead>
-                  <tr><th>Nome</th><th>Tempo</th><th>Atraso</th></tr>
+                  <tr><th>Nome</th><th>Tempo</th><th>Atraso / Adiantado</th></tr>
                 </thead>
                 <tbody>
                   {blockReport.map(({ block, hasRun, delaySeconds }) => (
@@ -422,11 +427,6 @@ export function ManagementClient() {
             <p className="report-empty">Nenhum evento aberto.</p>
           )}
         </aside>
-        <section className="preview-panel">
-          <p className="eyebrow">PREVIEW AO VIVO</p>
-          <StagePresentation snapshot={snapshot} block={currentBlock} />
-          <small>Versao {snapshot?.version ?? "-"} · {connection}</small>
-        </section>
       </section>
     </main>
   );
