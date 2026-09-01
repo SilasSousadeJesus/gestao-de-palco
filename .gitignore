@@ -1,0 +1,14 @@
+# Preferencias individuais desta maquina. O README explica o formato.
+.sdd/local/*
+!.sdd/local/README.md
+
+# Arquivos comuns de ambiente e ferramentas.
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+build/
+coverage/
+.DS_Store
+Thumbs.db
