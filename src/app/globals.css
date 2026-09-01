@@ -1,0 +1,74 @@
+:root {
+  color: #17242a;
+  background: #f5f0e7;
+  font-family: "Trebuchet MS", "Gill Sans", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+.foundation-shell {
+  display: grid;
+  align-content: center;
+  gap: 1.25rem;
+  min-height: 100vh;
+  max-width: 58rem;
+  padding: clamp(2rem, 9vw, 7rem);
+  background:
+    radial-gradient(circle at 90% 10%, #f2b84b55 0, transparent 28rem),
+    linear-gradient(135deg, #f5f0e7, #e3f1ee);
+}
+
+.eyebrow {
+  margin: 0;
+  color: #127c70;
+  font-family: "Courier New", monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+
+h1 {
+  max-width: 12ch;
+  margin: 0;
+  color: #102e38;
+  font-size: clamp(2.5rem, 7vw, 5.5rem);
+  letter-spacing: -0.065em;
+  line-height: 0.92;
+}
+
+.foundation-copy {
+  max-width: 48rem;
+  margin: 0;
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  line-height: 1.55;
+}
+
+.foundation-status {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: fit-content;
+  padding: 0.7rem 0.95rem;
+  border: 1px solid #127c7044;
+  border-radius: 999px;
+  background: #ffffff99;
+  color: #0e5f56;
+  font-family: "Courier New", monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.foundation-status span {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: #41c7b3;
+  box-shadow: 0 0 0 0.25rem #41c7b333;
+}

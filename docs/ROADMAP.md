@@ -14,8 +14,8 @@
 
 ### Aplicacao
 
-- [ ] Projeto Next.js com TypeScript configurado.
-- [ ] Banco SQLite local e migracoes.
+- [x] Projeto Next.js com TypeScript configurado.
+- [x] Banco SQLite local e migracoes.
 - [ ] Inicializacao automatica no Windows.
 - [ ] Tela de gestao e preview permanente.
 - [ ] Tela de palco em tela cheia.

@@ -35,6 +35,23 @@ O servidor roda inicialmente no PC do palco. Para outros dispositivos, ele escut
 
 O roteador pode estar sem acesso a internet. Ele continua distribuindo IPs e permitindo comunicacao entre os dispositivos conectados a ele.
 
+## MR18 e Gestao de Palco na mesma rede
+
+O mesmo roteador pode conectar a mesa Behringer MR18 e o Gestao de Palco. O PC do palco executa o X Air Edit para controlar a mesa e a aplicacao local para controlar o monitor HDMI.
+
+```text
+PC do palco ---- Ethernet ---- Roteador ---- Ethernet ---- MR18
+      |
+      +-- HDMI para o monitor de palco
+      +-- Wi-Fi do roteador para tablet e notebook
+```
+
+- Preferir Ethernet para PC e MR18; o Wi-Fi fica para tablet e notebook.
+- Configurar a MR18 em `ETHERNET` com DHCP cliente. Como alternativa, usar `Wi-Fi Client` no Wi-Fi 2.4 GHz do roteador.
+- Reservar IPs no roteador para PC e MR18, por exemplo `192.168.50.10` e `192.168.50.20`.
+- Nao usar o Access Point interno da MR18 como rede principal da operacao. O roteador externo centraliza DHCP, alcance e seguranca.
+- Desativar rede de convidados e isolamento entre clientes no roteador para que os controles encontrem PC e MR18.
+
 ## Inicio do culto
 
 1. Ligar PC, roteador e monitor de palco.

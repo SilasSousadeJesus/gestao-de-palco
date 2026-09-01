@@ -7,8 +7,13 @@
 .env.*
 !.env.example
 node_modules/
+.next/
 dist/
 build/
 coverage/
+*.tsbuildinfo
+data/*.db
+data/*.db-shm
+data/*.db-wal
 .DS_Store
 Thumbs.db
