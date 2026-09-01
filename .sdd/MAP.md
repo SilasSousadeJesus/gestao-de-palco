@@ -47,6 +47,18 @@
 - O SQLite foi escolhido para um unico PC; nao usar o mesmo arquivo simultaneamente por pasta de sincronizacao em nuvem.
 - A fundacao nao libera acesso pela LAN ainda; isso entra na Fase 6 com PIN/login e regras de firewall.
 - O hub de SSE e local ao processo. Nao escalar para varias instancias Next sem substituir essa notificacao por um barramento compartilhado.
+- A Rodada 5 deve ser reavaliada porque commits recentes foram removidos por quebra de layout.
+
+## Regra obrigatoria de documentacao
+
+Toda alteracao futura deve atualizar os documentos ativos afetados, o roadmap e o `RECORD.md` da demanda. Sem esses registros, a demanda nao esta concluida.
+
+## Estado tecnico bloqueante
+
+- `npm run lint` passa.
+- `npm run typecheck` e `npm run build` falham no parser de `durationSeconds` das mensagens.
+- `npm run test:db` falha porque o teste do snapshot nao contempla `activeMessageContent` e `messageExpiresAt`.
+- Antes de escrever qualquer funcionalidade nova, corrigir esses tres pontos e registrar a evidencia no `RECORD.md` da demanda.
 
 ## Lacunas a confirmar com o usuario
 

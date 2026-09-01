@@ -12,6 +12,28 @@
 | Proxima etapa proposta    | Fase 5 - Mensagens e automacoes                             |
 | Proxima escrita de codigo | Exige demanda, plano aprovado e leitura documental completa |
 
+> **ALERTA:** a Rodada 5 falhou e os ultimos commits foram removidos pelo usuario por quebra de layout. Antes de retoma-la, reavaliar codigo, migrations, testes e comportamento real. Nenhuma funcionalidade da Rodada 5 deve ser considerada entregue sem essa reconciliacao.
+
+> **REGRA OBRIGATORIA:** toda alteracao futura deve atualizar, na mesma demanda, os documentos ativos afetados e o `RECORD.md`. Sem documentacao atualizada, a entrega permanece incompleta.
+
+## Auditoria de reconciliacao em 01/09/2026
+
+- O estado confirmado do Git esta no commit `d314937`; as alteracoes nao commitadas desta demanda sao apenas documentais.
+- `npm run lint` passou.
+- `npm run typecheck` e `npm run build` falharam no parser de comandos de mensagens.
+- `npm run test:db` falhou porque o teste de snapshot nao foi atualizado para os campos de mensagem.
+- As migrations `0002_superb_ikaris.sql` (tempo decorrido) e `0003_wonderful_nick_fury.sql` (estado base de mensagem) existem e foram aplicadas localmente.
+- A Rodada 5 permanece parcial: dominio e schema possuem base de mensagem, mas a interface de gestao e automacoes nao foram entregues nem validadas.
+- O projeto esta bloqueado para novas funcionalidades ate corrigir tipagem, testes e build.
+
+## Retomada obrigatoria da Rodada 5
+
+1. Corrigir o parser de `durationSeconds` das mensagens.
+2. Atualizar testes para os campos de mensagem e adicionar regressao de pausa/retomada do tempo decorrido.
+3. Fazer lint, tipagem, testes e build passarem.
+4. Implementar e validar controles de mensagem temporaria, permanente e limpeza no console.
+5. Somente depois implementar agendamento e aviso automatico de atraso.
+
 ## O que ja existe
 
 - Configuracao de IA em `AGENTS.md` e `.sdd/`.
