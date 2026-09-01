@@ -7,9 +7,9 @@
 | Campo                     | Estado atual                                                |
 | ------------------------- | ----------------------------------------------------------- |
 | Ultima atualizacao        | 01/09/2026                                                  |
-| Fase atual                | Fase 2 - Estado e sincronia concluida                       |
-| Software de produto       | Fundacao e sincronizacao local implementadas                |
-| Proxima etapa proposta    | Fase 3 - Eventos e console de gestao                        |
+| Fase atual                | Fase 3 - Eventos e console de gestao concluida              |
+| Software de produto       | Gestao local, blocos, console e preview implementados       |
+| Proxima etapa proposta    | Fase 4 - Tela de palco e timers                             |
 | Proxima escrita de codigo | Exige demanda, plano aprovado e leitura documental completa |
 
 ## O que ja existe
@@ -25,7 +25,8 @@
 - `StageSnapshot` versionado, comandos idempotentes e registro de comandos em SQLite.
 - APIs locais para consultar, comandar e receber estado por SSE.
 - Pagina tecnica em `/sync-lab` para validar versao, conexao e recuperacao do estado.
-- Ainda nao existem eventos funcionais em interface, timers visuais, preview definitivo, tela HDMI ou mensagens.
+- Painel de gestao em `/`, com eventos, blocos, console e preview 16:9.
+- Ainda nao existem tela HDMI em tela cheia, mensagens ou automacoes.
 
 ## Decisoes confirmadas
 
@@ -94,6 +95,11 @@
 - `npm run db:migrate` aplicou a migration autorizada no SQLite local.
 - `npm run lint`, `npm run typecheck`, `npm run test:db` e `npm run build` passaram.
 - Um cliente HTTP local abriu o stream SSE; apos o comando `start`, recebeu o mesmo snapshot persistido na versao `1`.
+
+## Evidencias da Fase 3
+
+- O painel permite criar evento, adicionar bloco e iniciar o bloco no estado sincronizado.
+- `npm run lint`, `npm run typecheck`, `npm run test:db` e `npm run build` passaram.
 
 ## Regra de manutencao
 

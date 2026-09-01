@@ -4,7 +4,7 @@
 
 | Campo                    | Valor                                                                   |
 | ------------------------ | ----------------------------------------------------------------------- |
-| Estado do mapeamento     | Fase 2 concluida em 01/09/2026                                          |
+| Estado do mapeamento     | Fase 3 concluida em 01/09/2026                                          |
 | Arquitetura              | Aplicacao Next.js auto-hospedada em um unico PC, com SQLite local       |
 | Linguagens e frameworks  | TypeScript, Next.js 16, React 19, Drizzle ORM e SQLite                  |
 | Como executar localmente | `npm install`, `npm run db:migrate`, `npm run dev`                      |
@@ -14,7 +14,8 @@
 
 | Modulo ou caminho  | Responsabilidade                              | Tecnologia           | Validacao             | Riscos e observacoes                                                |
 | ------------------ | --------------------------------------------- | -------------------- | --------------------- | ------------------------------------------------------------------- |
-| `src/app/`         | Paginas e APIs locais do aplicativo           | Next.js App Router   | `npm run build`       | `/sync-lab` e diagnostico; telas finais entram nas fases 3 e 4     |
+| `src/app/`         | Gestao, preview e APIs locais                  | Next.js App Router   | `npm run build`       | Tela HDMI final entra na Fase 4                                    |
+| `src/features/events/` | Eventos e blocos do culto                   | TypeScript e SQLite | `npm run test:db`     | Edicao e reordenacao visual ainda pendentes                         |
 | `src/db/schema.ts` | Contrato do dominio persistido                | Drizzle ORM e SQLite | `npm run db:generate` | Schema inicial; evoluir somente com migracao versionada             |
 | `src/db/client.ts` | Conexao SQLite local e pragmas de integridade | `better-sqlite3`     | `npm run db:migrate`  | Cria a pasta local, habilita chaves estrangeiras e WAL              |
 | `src/features/stage/` | Estado de palco, SSE e reconexao            | TypeScript e React   | `npm run test:db`     | SSE requer uma unica instancia local do Next                         |

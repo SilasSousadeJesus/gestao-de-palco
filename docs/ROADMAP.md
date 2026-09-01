@@ -17,10 +17,10 @@
 - [x] Projeto Next.js com TypeScript configurado.
 - [x] Banco SQLite local e migracoes.
 - [ ] Inicializacao automatica no Windows.
-- [ ] Tela de gestao e preview permanente.
+- [x] Tela de gestao e preview permanente.
 - [ ] Tela de palco em tela cheia.
 - [x] Estado de palco versionado e sincronizacao local.
-- [ ] Eventos, historico e relatorio.
+- [x] Eventos e historico basico.
 - [ ] Timers positivos, pausa e contagem negativa.
 - [ ] Mensagens manuais, temporarias e permanentes.
 - [ ] Mensagens programadas e aviso automatico de atraso.
@@ -56,14 +56,14 @@
 
 **Objetivo:** permitir preparar e controlar um culto manualmente.
 
-- Criar, editar, abrir e encerrar eventos.
-- Listar historico de eventos.
-- Criar, editar, reordenar e remover blocos de tempo.
-- Mostrar tempo total planejado do evento.
-- Implementar console ao vivo com bloco atual e controles de timer.
-- Adicionar preview 16:9 permanente com o mesmo componente do palco.
+- [x] Criar e abrir eventos; o encerramento por controle visual fica pendente.
+- [x] Listar historico basico de eventos.
+- [x] Criar blocos e remover blocos pela API; edicao e reordenacao ficam pendentes.
+- [x] Mostrar tempo total planejado do evento.
+- [x] Implementar console ao vivo com bloco atual e controles de timer.
+- [x] Adicionar preview 16:9 permanente com o mesmo componente do palco.
 
-**Pronto quando:** o operador prepara um culto e acompanha no preview o mesmo timer que seria exibido no monitor de palco.
+**Pronto quando:** o operador prepara um culto e acompanha no preview o mesmo timer que seria exibido no monitor de palco. A base foi entregue; os controles de edicao e encerramento serao completados junto aos fluxos de conclusao da Fase 7.
 
 ## Fase 4 - Tela de palco e timers
 

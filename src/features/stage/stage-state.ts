@@ -7,6 +7,7 @@ export type StageCommandType = (typeof stageCommandTypes)[number];
 export type StageSnapshot = {
   eventId: string;
   version: number;
+  activeBlockId: string | null;
   mode: "idle" | "running" | "paused";
   startedAt: number | null;
   pausedAt: number | null;
@@ -17,12 +18,14 @@ export type StageSnapshot = {
 export type StageCommand = {
   commandId: string;
   type: StageCommandType;
+  blockId?: string;
   expectedVersion?: number;
 };
 
 type StageStateRow = {
   event_id: string;
   version: number;
+  active_block_id: string | null;
   mode: StageSnapshot["mode"];
   started_at: number | null;
   paused_at: number | null;
@@ -50,6 +53,7 @@ function toSnapshot(row: StageStateRow): StageSnapshot {
   return {
     eventId: row.event_id,
     version: row.version,
+    activeBlockId: row.active_block_id,
     mode: row.mode,
     startedAt: row.started_at,
     pausedAt: row.paused_at,
@@ -61,7 +65,7 @@ function toSnapshot(row: StageStateRow): StageSnapshot {
 function getSnapshot(database: Database.Database, eventId: string): StageSnapshot {
   const row = database
     .prepare(
-      `select event_id, version, mode, started_at, paused_at,
+      `select event_id, version, active_block_id, mode, started_at, paused_at,
         paused_elapsed_seconds, updated_at
        from stage_states where event_id = ?`,
     )
@@ -76,12 +80,16 @@ function getSnapshot(database: Database.Database, eventId: string): StageSnapsho
 
 function nextSnapshot(
   current: StageSnapshot,
-  type: StageCommandType,
+  command: StageCommand,
   now: number,
 ): Omit<StageSnapshot, "eventId" | "version"> {
-  switch (type) {
+  switch (command.type) {
     case "start":
+      if (!command.blockId) {
+        throw new StageStateError("invalid_state", "Selecione um bloco antes de iniciar.");
+      }
       return {
+        activeBlockId: command.blockId,
         mode: "running",
         startedAt: now,
         pausedAt: null,
@@ -94,6 +102,7 @@ function nextSnapshot(
       }
 
       return {
+        activeBlockId: current.activeBlockId,
         mode: "paused",
         startedAt: current.startedAt,
         pausedAt: now,
@@ -107,6 +116,7 @@ function nextSnapshot(
       }
 
       return {
+        activeBlockId: current.activeBlockId,
         mode: "running",
         startedAt: now - current.pausedElapsedSeconds * 1000,
         pausedAt: null,
@@ -115,6 +125,7 @@ function nextSnapshot(
       };
     case "clear":
       return {
+        activeBlockId: null,
         mode: "idle",
         startedAt: null,
         pausedAt: null,
@@ -161,7 +172,16 @@ export function applyStageCommand(
       );
     }
 
-    const changed = nextSnapshot(current, command.type, now);
+    if (command.blockId) {
+      const block = database
+        .prepare("select 1 from time_blocks where id = ? and event_id = ?")
+        .get(command.blockId, eventId);
+      if (!block) {
+        throw new StageStateError("invalid_state", "O bloco nao pertence a este evento.");
+      }
+    }
+
+    const changed = nextSnapshot(current, command, now);
     const snapshot: StageSnapshot = {
       eventId,
       version: current.version + 1,
@@ -171,12 +191,13 @@ export function applyStageCommand(
     database
       .prepare(
         `update stage_states
-         set version = ?, mode = ?, started_at = ?, paused_at = ?,
+         set version = ?, active_block_id = ?, mode = ?, started_at = ?, paused_at = ?,
              paused_elapsed_seconds = ?, updated_at = ?
          where event_id = ?`,
       )
       .run(
         snapshot.version,
+        snapshot.activeBlockId,
         snapshot.mode,
         snapshot.startedAt,
         snapshot.pausedAt,

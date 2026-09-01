@@ -38,6 +38,13 @@ function createDatabase() {
        values ('evento', 0, 'idle', 0)`,
     )
     .run();
+  database
+    .prepare(
+      `insert into time_blocks (
+        id, event_id, title, duration_seconds, position, is_sequential, created_at, updated_at
+      ) values ('bloco', 'evento', 'Bloco', 60, 0, 0, 0, 0)`,
+    )
+    .run();
 
   return database;
 }
@@ -47,19 +54,20 @@ test("comandos de palco persistem versao e sao idempotentes", () => {
   const first = applyStageCommand(
     database,
     "evento",
-    { commandId: "inicio", expectedVersion: 0, type: "start" },
+    { blockId: "bloco", commandId: "inicio", expectedVersion: 0, type: "start" },
     1_000,
   );
   const replay = applyStageCommand(
     database,
     "evento",
-    { commandId: "inicio", expectedVersion: 0, type: "start" },
+    { blockId: "bloco", commandId: "inicio", expectedVersion: 0, type: "start" },
     2_000,
   );
 
   assert.deepEqual(first, {
     eventId: "evento",
     version: 1,
+    activeBlockId: "bloco",
     mode: "running",
     startedAt: 1_000,
     pausedAt: null,
@@ -80,7 +88,7 @@ test("comandos com versao desatualizada nao alteram o palco", () => {
   applyStageCommand(
     database,
     "evento",
-    { commandId: "inicio", expectedVersion: 0, type: "start" },
+    { blockId: "bloco", commandId: "inicio", expectedVersion: 0, type: "start" },
     1_000,
   );
 
