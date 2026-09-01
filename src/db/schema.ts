@@ -23,6 +23,7 @@ export const timeBlocks = sqliteTable("time_blocks", {
     .references(() => events.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
   durationSeconds: integer("duration_seconds").notNull(),
+  actualSeconds: integer("actual_seconds"),
   position: integer("position").notNull(),
   isSequential: integer("is_sequential", { mode: "boolean" })
     .notNull()

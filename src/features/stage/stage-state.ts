@@ -216,6 +216,27 @@ export function applyStageCommand(
         .run(now, eventId);
     }
 
+    if (command.type === "clear" && command.resetElapsed) {
+      database
+        .prepare("update time_blocks set actual_seconds = null, updated_at = ? where event_id = ?")
+        .run(now, eventId);
+    } else if (
+      (command.type === "start" || command.type === "clear") &&
+      current.activeBlockId &&
+      current.mode === "running" &&
+      current.startedAt !== null
+    ) {
+      const ranSeconds = Math.max(0, Math.floor((now - current.startedAt) / 1000));
+      if (ranSeconds > 0) {
+        database
+          .prepare(
+            `update time_blocks set actual_seconds = coalesce(actual_seconds, 0) + ?, updated_at = ?
+             where id = ? and event_id = ?`,
+          )
+          .run(ranSeconds, now, current.activeBlockId, eventId);
+      }
+    }
+
     const changed = nextSnapshot(current, command, now);
     const snapshot: StageSnapshot = {
       ...current,

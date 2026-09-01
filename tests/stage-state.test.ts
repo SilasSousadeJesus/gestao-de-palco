@@ -188,3 +188,61 @@ test("limpar palco preserva o tempo decorrido por padrao, mas zera quando resetE
   assert.equal(clearedWithReset.mode, "idle");
   assert.equal(clearedWithReset.eventElapsedSeconds, 0);
 });
+
+test("trocar de bloco acumula actual_seconds do bloco anterior; limpar palco com resetElapsed zera todos os blocos", () => {
+  const database = createDatabase();
+  database
+    .prepare(
+      `insert into time_blocks (
+        id, event_id, title, duration_seconds, position, is_sequential, created_at, updated_at
+      ) values ('bloco-2', 'evento', 'Bloco 2', 120, 1, 0, 0, 0)`,
+    )
+    .run();
+
+  const actualSecondsOf = (blockId: string) =>
+    (database.prepare("select actual_seconds as actualSeconds from time_blocks where id = ?").get(blockId) as { actualSeconds: number | null })
+      .actualSeconds;
+
+  applyStageCommand(
+    database,
+    "evento",
+    { blockId: "bloco", commandId: "inicio", expectedVersion: 0, type: "start" },
+    0,
+  );
+
+  applyStageCommand(
+    database,
+    "evento",
+    { blockId: "bloco-2", commandId: "troca", expectedVersion: 1, type: "start" },
+    10_000,
+  );
+
+  assert.equal(actualSecondsOf("bloco"), 10);
+
+  applyStageCommand(
+    database,
+    "evento",
+    { commandId: "limpar-1", expectedVersion: 2, type: "clear" },
+    15_000,
+  );
+
+  assert.equal(actualSecondsOf("bloco-2"), 5);
+  assert.equal(actualSecondsOf("bloco"), 10);
+
+  applyStageCommand(
+    database,
+    "evento",
+    { blockId: "bloco", commandId: "inicio-2", expectedVersion: 3, type: "start" },
+    16_000,
+  );
+  const finalSnapshot = applyStageCommand(
+    database,
+    "evento",
+    { commandId: "limpar-2", expectedVersion: 4, type: "clear", resetElapsed: true },
+    20_000,
+  );
+
+  assert.equal(actualSecondsOf("bloco"), null);
+  assert.equal(actualSecondsOf("bloco-2"), null);
+  assert.equal(finalSnapshot.eventElapsedSeconds, 0);
+});

@@ -6,7 +6,7 @@ import { confirmDelete } from "@/lib/confirm-dialog";
 import { StagePresentation } from "@/features/stage/stage-presentation";
 import { useStageSnapshot } from "@/features/stage/use-stage-snapshot";
 
-type Block = { id: string; title: string; durationSeconds: number; position: number };
+type Block = { id: string; title: string; durationSeconds: number; actualSeconds: number | null; position: number };
 type EventItem = { id: string; title: string; status: string; plannedSeconds: number; blocks?: Block[] };
 
 function Icon({ children, filled = false }: { children: ReactNode; filled?: boolean }) {
@@ -40,6 +40,14 @@ const IconX = () => <Icon><path d="M5 5l10 10M15 5L5 15" /></Icon>;
 const minutes = (seconds: number) => `${Math.floor(seconds / 60)} min`;
 const elapsedTime = (seconds: number) =>
   `${String(Math.floor(seconds / 3600)).padStart(2, "0")}:${String(Math.floor((seconds % 3600) / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
+const currentTimeLabel = (timestamp: number) => {
+  const date = new Date(timestamp);
+  return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}:${String(date.getSeconds()).padStart(2, "0")}`;
+};
+const formatDelay = (seconds: number) => {
+  const totalMinutes = Math.round(seconds / 60);
+  return `${totalMinutes > 0 ? "+" : ""}${totalMinutes} min`;
+};
 
 export function ManagementClient() {
   const [events, setEvents] = useState<EventItem[]>([]);
@@ -180,7 +188,10 @@ export function ManagementClient() {
         ...(resetElapsed ? { resetElapsed: true } : {}),
       }),
     });
-    if (response.ok) setSnapshot(await response.json());
+    if (response.ok) {
+      setSnapshot(await response.json());
+      await openEvent(active.id);
+    }
   };
 
   const sendMessage = async (permanent: boolean) => {
@@ -228,6 +239,18 @@ export function ManagementClient() {
   const elapsed = snapshot
     ? snapshot.eventElapsedSeconds + (snapshot.mode === "running" && snapshot.startedAt ? Math.floor((clock - snapshot.startedAt) / 1000) : 0)
     : 0;
+  const blockReport = (active?.blocks ?? []).map((block) => {
+    const liveExtra =
+      snapshot && snapshot.activeBlockId === block.id && snapshot.mode === "running" && snapshot.startedAt !== null
+        ? Math.max(0, Math.floor((clock - snapshot.startedAt) / 1000))
+        : 0;
+    const actualSeconds = (block.actualSeconds ?? 0) + liveExtra;
+    const hasRun = actualSeconds > 0;
+    const delaySeconds = block.durationSeconds - actualSeconds;
+    return { block, hasRun, delaySeconds };
+  });
+  const totalDelaySeconds = blockReport.filter((row) => row.hasRun).reduce((sum, row) => sum + row.delaySeconds, 0);
+  const budgetSeconds = active ? active.plannedSeconds - elapsed : 0;
 
   return (
     <main className="management-shell">
@@ -279,6 +302,8 @@ export function ManagementClient() {
                   <h2>{active.title}</h2>
                 </div>
                 <strong>
+                  Horario atual: {currentTimeLabel(clock)}
+                  <br />
                   Total Planejado: {minutes(active.plannedSeconds)}
                   <br />
                   Tempo Decorrido: {elapsedTime(elapsed)}
@@ -339,8 +364,37 @@ export function ManagementClient() {
             <p>Crie ou selecione um evento para iniciar a preparacao.</p>
           )}
         </section>
-        <aside className="placeholder-panel">
-          <p className="eyebrow">EM BREVE</p>
+        <aside className="report-panel">
+          <p className="eyebrow">RELATORIO DE BLOCOS</p>
+          {active ? (
+            <table>
+              <thead>
+                <tr><th>Nome</th><th>Tempo</th><th>Atraso</th></tr>
+              </thead>
+              <tbody>
+                {blockReport.map(({ block, hasRun, delaySeconds }) => (
+                  <tr key={block.id}>
+                    <td>{block.title}</td>
+                    <td>{minutes(block.durationSeconds)}</td>
+                    <td className={hasRun && delaySeconds < 0 ? "is-late" : ""}>{hasRun ? formatDelay(delaySeconds) : "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td>Total</td>
+                  <td>{minutes(active.plannedSeconds)}</td>
+                  <td className={totalDelaySeconds < 0 ? "is-late" : ""}>{formatDelay(totalDelaySeconds)}</td>
+                </tr>
+                <tr>
+                  <td colSpan={2}>Planejado − Decorrido</td>
+                  <td className={budgetSeconds < 0 ? "is-late" : ""}>{formatDelay(budgetSeconds)}</td>
+                </tr>
+              </tfoot>
+            </table>
+          ) : (
+            <p className="report-empty">Nenhum evento aberto.</p>
+          )}
         </aside>
         <section className="preview-panel">
           <p className="eyebrow">PREVIEW AO VIVO</p>

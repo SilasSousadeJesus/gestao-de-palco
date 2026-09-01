@@ -17,6 +17,7 @@ export type TimeBlock = {
   eventId: string;
   title: string;
   durationSeconds: number;
+  actualSeconds: number | null;
   position: number;
   isSequential: boolean;
 };
@@ -25,7 +26,7 @@ function listBlocks(database: Database.Database, eventId: string) {
   return database
     .prepare(
       `select id, event_id as eventId, title, duration_seconds as durationSeconds,
-        position, is_sequential as isSequential from time_blocks
+        actual_seconds as actualSeconds, position, is_sequential as isSequential from time_blocks
        where event_id = ? order by position, created_at`,
     )
     .all(eventId) as TimeBlock[];
@@ -87,7 +88,7 @@ export function createBlock(database: Database.Database, eventId: string, input:
   if (!getEvent(database, eventId)) return null;
   const position = (database.prepare("select count(*) as count from time_blocks where event_id = ?").get(eventId) as { count: number }).count;
   const now = Date.now();
-  const block: TimeBlock = { id: randomUUID(), eventId, title, durationSeconds: input.durationSeconds, position, isSequential: false };
+  const block: TimeBlock = { id: randomUUID(), eventId, title, durationSeconds: input.durationSeconds, actualSeconds: null, position, isSequential: false };
   database.prepare(`insert into time_blocks (id, event_id, title, duration_seconds, position, is_sequential, created_at, updated_at) values (?, ?, ?, ?, ?, 0, ?, ?)`)
     .run(block.id, eventId, title, block.durationSeconds, position, now, now);
   return block;
