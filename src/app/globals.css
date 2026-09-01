@@ -72,3 +72,69 @@ h1 {
   background: #41c7b3;
   box-shadow: 0 0 0 0.25rem #41c7b333;
 }
+
+.sync-lab-shell {
+  display: grid;
+  gap: 1.25rem;
+  min-height: 100vh;
+  max-width: 58rem;
+  align-content: center;
+  padding: clamp(2rem, 9vw, 7rem);
+  background: linear-gradient(135deg, #f5f0e7, #e3f1ee);
+}
+
+.sync-lab-shell h1 {
+  font-size: clamp(2.5rem, 7vw, 5rem);
+}
+
+.sync-lab-copy,
+.sync-lab-error {
+  max-width: 48rem;
+  margin: 0;
+  line-height: 1.55;
+}
+
+.sync-lab-state {
+  display: grid;
+  gap: 0.35rem;
+  width: min(100%, 28rem);
+  padding: 1.25rem;
+  border: 1px solid #127c7044;
+  border-radius: 1rem;
+  background: #ffffffbb;
+  font-family: "Courier New", monospace;
+}
+
+.sync-lab-state strong {
+  color: #102e38;
+  font-size: 2rem;
+}
+
+.connection {
+  font-weight: 700;
+}
+
+.connection-connected {
+  color: #0e5f56;
+}
+
+.connection-reconnecting,
+.sync-lab-error {
+  color: #9e5016;
+}
+
+.sync-lab-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.sync-lab-actions button {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.75rem 1.1rem;
+  background: #102e38;
+  color: #fff;
+  cursor: pointer;
+  font: 700 0.9rem "Courier New", monospace;
+}

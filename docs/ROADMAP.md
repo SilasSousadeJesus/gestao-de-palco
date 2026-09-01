@@ -19,7 +19,7 @@
 - [ ] Inicializacao automatica no Windows.
 - [ ] Tela de gestao e preview permanente.
 - [ ] Tela de palco em tela cheia.
-- [ ] Estado de palco versionado e sincronizacao local.
+- [x] Estado de palco versionado e sincronizacao local.
 - [ ] Eventos, historico e relatorio.
 - [ ] Timers positivos, pausa e contagem negativa.
 - [ ] Mensagens manuais, temporarias e permanentes.
@@ -44,13 +44,13 @@
 
 **Objetivo:** garantir que gestao, preview e monitor HDMI representem o mesmo estado.
 
-- Criar `StageSnapshot` persistido com versao crescente.
-- Criar comandos idempotentes para iniciar, pausar, retomar e limpar estado.
-- Implementar notificacao local por streaming e reconexao.
-- Fazer a tela buscar estado ao abrir ou ao reconectar.
-- Mostrar versao, conexao e ultima confirmacao no painel de gestao.
+- [x] Criar `StageSnapshot` persistido com versao crescente.
+- [x] Criar comandos idempotentes para iniciar, pausar, retomar e limpar estado.
+- [x] Implementar notificacao local por streaming e reconexao.
+- [x] Fazer a tela buscar estado ao abrir ou ao reconectar.
+- [x] Exibir versao e conexao na pagina tecnica de diagnostico; o painel definitivo entra na Fase 3.
 
-**Pronto quando:** duas janelas no mesmo PC aplicam o mesmo comando sem recarga manual e a tela HDMI se recupera apos recarregar.
+**Pronto quando:** duas janelas no mesmo PC aplicam o mesmo comando sem recarga manual e a tela HDMI se recupera apos recarregar. A fundacao tecnica foi validada por HTTP e SSE; a validacao visual em duas janelas deve acompanhar a Fase 3, quando existirem gestao e palco.
 
 ## Fase 3 - Eventos e console de gestao
 

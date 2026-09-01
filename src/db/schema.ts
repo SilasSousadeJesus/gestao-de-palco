@@ -1,4 +1,9 @@
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import {
+  integer,
+  primaryKey,
+  sqliteTable,
+  text,
+} from "drizzle-orm/sqlite-core";
 
 export const events = sqliteTable("events", {
   id: text("id").primaryKey(),
@@ -61,6 +66,21 @@ export const stageStates = sqliteTable("stage_states", {
   pausedElapsedSeconds: integer("paused_elapsed_seconds"),
   updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
 });
+
+export const stageCommands = sqliteTable(
+  "stage_commands",
+  {
+    eventId: text("event_id")
+      .notNull()
+      .references(() => events.id, { onDelete: "cascade" }),
+    commandId: text("command_id").notNull(),
+    commandType: text("command_type").notNull(),
+    resultVersion: integer("result_version").notNull(),
+    snapshotJson: text("snapshot_json").notNull(),
+    createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.eventId, table.commandId] })],
+);
 
 export const eventReports = sqliteTable("event_reports", {
   eventId: text("event_id")

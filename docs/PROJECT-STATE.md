@@ -7,9 +7,9 @@
 | Campo                     | Estado atual                                                |
 | ------------------------- | ----------------------------------------------------------- |
 | Ultima atualizacao        | 01/09/2026                                                  |
-| Fase atual                | Fase 1 - Fundacao local concluida                           |
-| Software de produto       | Fundacao Next.js e SQLite implementada; recursos ainda nao  |
-| Proxima etapa proposta    | Fase 2 - Estado de palco e sincronia                        |
+| Fase atual                | Fase 2 - Estado e sincronia concluida                       |
+| Software de produto       | Fundacao e sincronizacao local implementadas                |
+| Proxima etapa proposta    | Fase 3 - Eventos e console de gestao                        |
 | Proxima escrita de codigo | Exige demanda, plano aprovado e leitura documental completa |
 
 ## O que ja existe
@@ -22,7 +22,10 @@
 - Schema Drizzle e primeira migracao SQLite para evento, bloco, mensagem, estado de palco e relatorio.
 - Banco local aplicado em `data/gestao-de-palco.db`; o arquivo e ignorado pelo Git.
 - Comandos de lint, tipagem, teste de migracao, build e desenvolvimento documentados no `README.md`.
-- Ainda nao existem eventos funcionais, timers, preview, tela HDMI, mensagens ou sincronizacao ao vivo.
+- `StageSnapshot` versionado, comandos idempotentes e registro de comandos em SQLite.
+- APIs locais para consultar, comandar e receber estado por SSE.
+- Pagina tecnica em `/sync-lab` para validar versao, conexao e recuperacao do estado.
+- Ainda nao existem eventos funcionais em interface, timers visuais, preview definitivo, tela HDMI ou mensagens.
 
 ## Decisoes confirmadas
 
@@ -33,6 +36,8 @@
 | Roteador pode ficar sem internet                     | A rede e privada e local                            | Sem dependencia de servico externo durante o culto                   |
 | Stack planejada: Next.js, TypeScript e SQLite        | Menor complexidade para um PC unico                 | Nao usar servidor Node separado, Postgres ou servico em nuvem no MVP |
 | Estado de palco e persistido e versionado            | Comandos nao podem depender de uma mensagem efemera | Preview e tela HDMI recuperam o ultimo estado salvo                  |
+| SSE local notifica mudancas, sem ser fonte de verdade | A notificacao pode cair ou reconectar                | Cada cliente busca o snapshot SQLite ao abrir e ao reconectar        |
+| Hub SSE fica no processo Next unico                  | O MVP roda em um PC local                            | Nao executar varias instancias Next ate haver um barramento externo  |
 | Preview usa o mesmo componente do palco              | O operador deve ver exatamente o que sera exibido   | Nao criar duas regras visuais de timer ou mensagem                   |
 | MR18 e Gestao de Palco usam o mesmo roteador externo | Um PC deve controlar audio e palco sem internet     | PC e MR18 preferem Ethernet; tablet usa Wi-Fi privado                |
 
@@ -54,6 +59,7 @@
 | Roteador ou Wi-Fi falha            | Tablet perde controle remoto                             | PC e tela HDMI continuam; operador pode controlar pelo PC         |
 | Estado local sem backup            | Historico e relatorios podem ser perdidos                | Backup seguro do SQLite e procedimento de restauracao             |
 | Tela HDMI recarrega                | Exibicao pode ficar momentaneamente indisponivel         | Buscar ultimo estado persistido e confirmar sincronizacao         |
+| Mais de um processo Next           | Clientes podem nao receber notificacoes entre processos  | Manter uma instancia local; evoluir a arquitetura antes de escalar |
 | Comando equivocado no culto        | Mensagem ou bloco pode mudar no momento errado           | Confirmacoes para acoes sensiveis e preview permanente            |
 | PC e MR18 em redes separadas       | Um operador nao controla os dois sistemas no mesmo lugar | Roteador externo centralizado e reservas DHCP                     |
 
@@ -81,6 +87,13 @@
 - `npm run db:migrate` aplicou a migracao em `data/gestao-de-palco.db`.
 - `npm run lint`, `npm run typecheck`, `npm run test:db` e `npm run build` passaram.
 - O teste HTTP local confirmou resposta `200` e o texto da pagina de fundacao.
+
+## Evidencias da Fase 2
+
+- `npm run db:generate` criou `drizzle/0001_careless_roland_deschain.sql` para `stage_commands`.
+- `npm run db:migrate` aplicou a migration autorizada no SQLite local.
+- `npm run lint`, `npm run typecheck`, `npm run test:db` e `npm run build` passaram.
+- Um cliente HTTP local abriu o stream SSE; apos o comando `start`, recebeu o mesmo snapshot persistido na versao `1`.
 
 ## Regra de manutencao
 

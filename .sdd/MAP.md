@@ -4,7 +4,7 @@
 
 | Campo                    | Valor                                                                   |
 | ------------------------ | ----------------------------------------------------------------------- |
-| Estado do mapeamento     | Fase 1 concluida em 01/09/2026                                          |
+| Estado do mapeamento     | Fase 2 concluida em 01/09/2026                                          |
 | Arquitetura              | Aplicacao Next.js auto-hospedada em um unico PC, com SQLite local       |
 | Linguagens e frameworks  | TypeScript, Next.js 16, React 19, Drizzle ORM e SQLite                  |
 | Como executar localmente | `npm install`, `npm run db:migrate`, `npm run dev`                      |
@@ -14,9 +14,10 @@
 
 | Modulo ou caminho  | Responsabilidade                              | Tecnologia           | Validacao             | Riscos e observacoes                                                |
 | ------------------ | --------------------------------------------- | -------------------- | --------------------- | ------------------------------------------------------------------- |
-| `src/app/`         | Entrada web e base visual do aplicativo       | Next.js App Router   | `npm run build`       | Ainda nao contem telas funcionais de gestao ou palco                |
+| `src/app/`         | Paginas e APIs locais do aplicativo           | Next.js App Router   | `npm run build`       | `/sync-lab` e diagnostico; telas finais entram nas fases 3 e 4     |
 | `src/db/schema.ts` | Contrato do dominio persistido                | Drizzle ORM e SQLite | `npm run db:generate` | Schema inicial; evoluir somente com migracao versionada             |
 | `src/db/client.ts` | Conexao SQLite local e pragmas de integridade | `better-sqlite3`     | `npm run db:migrate`  | Cria a pasta local, habilita chaves estrangeiras e WAL              |
+| `src/features/stage/` | Estado de palco, SSE e reconexao            | TypeScript e React   | `npm run test:db`     | SSE requer uma unica instancia local do Next                         |
 | `drizzle/`         | Historico de migracoes SQL                    | Drizzle Kit          | `npm run test:db`     | Versionado; nunca editar migracao ja aplicada sem nova demanda      |
 | `tests/`           | Teste estrutural da migracao inicial          | Node test runner     | `npm run test:db`     | Testa em memoria; nao substitui teste de interface                  |
 | `data/`            | Banco local de desenvolvimento                | SQLite               | `npm run db:migrate`  | Arquivos `.db` sao ignorados e nao devem ir para pasta sincronizada |
@@ -28,6 +29,8 @@
 | Inicializacao local | `npm run dev`        | Next.js e `src/app/`            | Aplicacao em `localhost:3000`  | Nao depende de internet                        |
 | Migracao local      | `npm run db:migrate` | Drizzle Kit, `drizzle/`, SQLite | Banco atualizado em `data/`    | So aplicar migracoes autorizadas e versionadas |
 | Validacao do schema | `npm run test:db`    | SQL gerado e SQLite em memoria  | Tabelas essenciais verificadas | O teste nao altera o banco local               |
+| Comando de palco   | `POST /api/events/:id/stage/commands` | SQLite, log idempotente e hub SSE | Snapshot versionado | `commandId` repetido devolve o mesmo resultado |
+| Sincronia de palco | `GET /api/events/:id/stage/stream` | SSE e cliente React | Snapshot atualizado | Reabertura sempre busca o snapshot SQLite      |
 
 ## Dados e integracoes
 
@@ -39,9 +42,10 @@
 
 ## Dividas e armadilhas conhecidas
 
-- A aplicacao ainda nao possui autenticacao, sincronizacao, interface de evento ou tela HDMI.
+- A aplicacao ainda nao possui autenticacao, interface de evento, preview definitivo ou tela HDMI.
 - O SQLite foi escolhido para um unico PC; nao usar o mesmo arquivo simultaneamente por pasta de sincronizacao em nuvem.
 - A fundacao nao libera acesso pela LAN ainda; isso entra na Fase 6 com PIN/login e regras de firewall.
+- O hub de SSE e local ao processo. Nao escalar para varias instancias Next sem substituir essa notificacao por um barramento compartilhado.
 
 ## Lacunas a confirmar com o usuario
 

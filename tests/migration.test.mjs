@@ -9,7 +9,7 @@ import Database from "better-sqlite3";
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
 const migrationsDirectory = path.resolve(currentDirectory, "../drizzle");
 
-test("a migracao inicial cria as tabelas do dominio", () => {
+test("as migracoes criam as tabelas do dominio e o registro idempotente", () => {
   const database = new Database(":memory:");
   const migrations = fs
     .readdirSync(migrationsDirectory)
@@ -35,7 +35,35 @@ test("a migracao inicial cria as tabelas do dominio", () => {
     "event_reports",
     "events",
     "message_cues",
+    "stage_commands",
     "stage_states",
     "time_blocks",
   ]);
+
+  database
+    .prepare(
+      `insert into events (
+        id, title, scheduled_at, display_mode, status, created_at, updated_at
+      ) values ('evento', 'Evento', 0, 'timer', 'draft', 0, 0)`,
+    )
+    .run();
+  database
+    .prepare(
+      `insert into stage_commands (
+        event_id, command_id, command_type, result_version, snapshot_json, created_at
+      ) values ('evento', 'comando', 'start', 1, '{}', 0)`,
+    )
+    .run();
+
+  assert.throws(
+    () =>
+      database
+        .prepare(
+          `insert into stage_commands (
+            event_id, command_id, command_type, result_version, snapshot_json, created_at
+          ) values ('evento', 'comando', 'start', 1, '{}', 0)`,
+        )
+        .run(),
+    /UNIQUE constraint failed/,
+  );
 });
