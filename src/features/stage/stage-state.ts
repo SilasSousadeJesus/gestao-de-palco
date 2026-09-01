@@ -1,6 +1,6 @@
 import type Database from "better-sqlite3";
 
-export const stageCommandTypes = ["start", "pause", "resume", "clear"] as const;
+export const stageCommandTypes = ["start", "pause", "resume", "clear", "show_message", "clear_message"] as const;
 
 export type StageCommandType = (typeof stageCommandTypes)[number];
 
@@ -9,6 +9,8 @@ export type StageSnapshot = {
   version: number;
   eventElapsedSeconds: number;
   activeBlockId: string | null;
+  activeMessageContent: string | null;
+  messageExpiresAt: number | null;
   mode: "idle" | "running" | "paused";
   startedAt: number | null;
   pausedAt: number | null;
@@ -20,6 +22,8 @@ export type StageCommand = {
   commandId: string;
   type: StageCommandType;
   blockId?: string;
+  message?: string;
+  durationSeconds?: number | null;
   expectedVersion?: number;
 };
 
@@ -28,6 +32,8 @@ type StageStateRow = {
   version: number;
   event_elapsed_seconds: number;
   active_block_id: string | null;
+  active_message_content: string | null;
+  message_expires_at: number | null;
   mode: StageSnapshot["mode"];
   started_at: number | null;
   paused_at: number | null;
@@ -57,6 +63,8 @@ function toSnapshot(row: StageStateRow): StageSnapshot {
     version: row.version,
     eventElapsedSeconds: row.event_elapsed_seconds,
     activeBlockId: row.active_block_id,
+    activeMessageContent: row.active_message_content,
+    messageExpiresAt: row.message_expires_at,
     mode: row.mode,
     startedAt: row.started_at,
     pausedAt: row.paused_at,
@@ -68,7 +76,7 @@ function toSnapshot(row: StageStateRow): StageSnapshot {
 function getSnapshot(database: Database.Database, eventId: string): StageSnapshot {
   const row = database
     .prepare(
-      `select event_id, version, event_elapsed_seconds, active_block_id, mode, started_at, paused_at,
+      `select event_id, version, event_elapsed_seconds, active_block_id, active_message_content, message_expires_at, mode, started_at, paused_at,
         paused_elapsed_seconds, updated_at
        from stage_states where event_id = ?`,
     )
@@ -85,7 +93,7 @@ function nextSnapshot(
   current: StageSnapshot,
   command: StageCommand,
   now: number,
-): Omit<StageSnapshot, "eventId" | "version"> {
+): Partial<Omit<StageSnapshot, "eventId" | "version">> {
   const runningSeconds = current.mode === "running" && current.startedAt !== null
     ? Math.max(0, Math.floor((now - current.startedAt) / 1000))
     : 0;
@@ -125,7 +133,7 @@ function nextSnapshot(
       }
 
       return {
-        eventElapsedSeconds: current.eventElapsedSeconds,
+        eventElapsedSeconds: Math.max(0, current.eventElapsedSeconds - current.pausedElapsedSeconds),
         activeBlockId: current.activeBlockId,
         mode: "running",
         startedAt: now - current.pausedElapsedSeconds * 1000,
@@ -143,6 +151,11 @@ function nextSnapshot(
         pausedElapsedSeconds: null,
         updatedAt: now,
       };
+    case "show_message":
+      if (!command.message?.trim()) throw new StageStateError("invalid_state", "Informe uma mensagem.");
+      return { activeBlockId: current.activeBlockId, activeMessageContent: command.message.trim(), messageExpiresAt: command.durationSeconds ? now + command.durationSeconds * 1000 : null, eventElapsedSeconds: current.eventElapsedSeconds, mode: current.mode, startedAt: current.startedAt, pausedAt: current.pausedAt, pausedElapsedSeconds: current.pausedElapsedSeconds, updatedAt: now };
+    case "clear_message":
+      return { activeBlockId: current.activeBlockId, activeMessageContent: null, messageExpiresAt: null, eventElapsedSeconds: current.eventElapsedSeconds, mode: current.mode, startedAt: current.startedAt, pausedAt: current.pausedAt, pausedElapsedSeconds: current.pausedElapsedSeconds, updatedAt: now };
   }
 }
 
@@ -204,6 +217,7 @@ export function applyStageCommand(
 
     const changed = nextSnapshot(current, command, now);
     const snapshot: StageSnapshot = {
+      ...current,
       eventId,
       version: current.version + 1,
       ...changed,
@@ -212,7 +226,7 @@ export function applyStageCommand(
     database
       .prepare(
         `update stage_states
-         set version = ?, event_elapsed_seconds = ?, active_block_id = ?, mode = ?, started_at = ?, paused_at = ?,
+         set version = ?, event_elapsed_seconds = ?, active_block_id = ?, active_message_content = ?, message_expires_at = ?, mode = ?, started_at = ?, paused_at = ?,
              paused_elapsed_seconds = ?, updated_at = ?
          where event_id = ?`,
       )
@@ -220,6 +234,8 @@ export function applyStageCommand(
         snapshot.version,
         snapshot.eventElapsedSeconds,
         snapshot.activeBlockId,
+        snapshot.activeMessageContent,
+        snapshot.messageExpiresAt,
         snapshot.mode,
         snapshot.startedAt,
         snapshot.pausedAt,

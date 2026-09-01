@@ -20,6 +20,8 @@ function parseCommand(value: unknown): StageCommand | null {
   const type = input.type;
   const expectedVersion = input.expectedVersion;
   const blockId = input.blockId;
+  const message = input.message;
+  const durationSeconds = input.durationSeconds;
 
   if (
     typeof commandId !== "string" ||
@@ -28,6 +30,8 @@ function parseCommand(value: unknown): StageCommand | null {
     typeof type !== "string" ||
     !stageCommandTypes.includes(type as StageCommand["type"]) ||
     (blockId !== undefined && (typeof blockId !== "string" || blockId.length === 0)) ||
+    (message !== undefined && typeof message !== "string") ||
+    (durationSeconds !== undefined && durationSeconds !== null && (!Number.isInteger(durationSeconds) || durationSeconds < 1)) ||
     (expectedVersion !== undefined &&
       (typeof expectedVersion !== "number" ||
         !Number.isInteger(expectedVersion) ||
@@ -40,6 +44,8 @@ function parseCommand(value: unknown): StageCommand | null {
     commandId,
     type: type as StageCommand["type"],
     ...(blockId === undefined ? {} : { blockId }),
+    ...(message === undefined ? {} : { message }),
+    ...(durationSeconds === undefined ? {} : { durationSeconds }),
     ...(expectedVersion === undefined ? {} : { expectedVersion }),
   };
 }

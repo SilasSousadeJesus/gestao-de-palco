@@ -61,6 +61,8 @@ export const stageStates = sqliteTable("stage_states", {
   activeMessageId: text("active_message_id").references(() => messageCues.id, {
     onDelete: "set null",
   }),
+  activeMessageContent: text("active_message_content"),
+  messageExpiresAt: integer("message_expires_at", { mode: "timestamp_ms" }),
   mode: text("mode").notNull().default("idle"),
   startedAt: integer("started_at", { mode: "timestamp_ms" }),
   pausedAt: integer("paused_at", { mode: "timestamp_ms" }),
