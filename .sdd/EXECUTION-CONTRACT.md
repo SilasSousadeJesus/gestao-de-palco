@@ -4,7 +4,7 @@ Este contrato define como pessoas e agentes colaboram neste repositorio. Ele val
 
 ## 1. Contexto antes de acao
 
-Leia `AGENTS.md`, este contrato, `PROJECT-BRIEF.md` e `MAP.md` antes de agir. Leia `.sdd/local/` por ultimo, se houver arquivos. Para assunto especializado, leia somente o guia aplicavel em `.sdd/knowledge/`.
+Leia `AGENTS.md`, este contrato, `PROJECT-BRIEF.md` e `MAP.md` antes de agir. Para implementar, leia tambem `docs/README.md` e todos os documentos ativos que ele lista. Leia `.sdd/local/` por ultimo, se houver arquivos. Para assunto especializado, leia somente o guia aplicavel em `.sdd/knowledge/`.
 
 O usuario pode editar `PROJECT-BRIEF.md` a qualquer momento. Essa descricao do produto e uma fonte primaria: nao a substitua por inferencias do codigo.
 
@@ -22,7 +22,7 @@ Uma preferencia local preenche escolhas abertas, como idioma, ordem de leitura e
 
 Antes de criar, editar, mover ou apagar qualquer arquivo, o agente deve mostrar um plano conciso e esperar aprovacao explicita. O plano deve listar escopo, arquivos esperados, validacao e riscos relevantes.
 
-Perguntas e investigacoes somente de leitura nao exigem plano. Se houver ambiguidade material, pergunte antes de agir.
+Em qualquer implementacao, antes do plano o agente deve declarar a fase atual, a proxima etapa e as observacoes ou riscos relevantes encontrados na documentacao ativa. Perguntas e investigacoes somente de leitura nao exigem plano. Se houver ambiguidade material, pergunte antes de agir.
 
 ## 4. Seguranca e acoes de alto risco
 
@@ -44,9 +44,13 @@ Mudancas relevantes devem usar uma pasta em `.sdd/features/<AAAA-MM-DD>-<slug>/`
 
 O registro deve ser honesto: nao declare teste, revisao ou comportamento que nao tenha sido verificado.
 
+Antes de fechar uma demanda, o `RECORD.md` deve informar quais documentos ativos foram consultados e quais foram atualizados. Mudanca em comportamento, arquitetura, operacao, decisao, risco ou fase exige atualizar o documento ativo correspondente.
+
 ## 6. Validacao
 
 `MAP.md` e os guias em `.sdd/knowledge/` devem informar os comandos de validacao por modulo. Ao concluir uma mudanca, execute o que for aplicavel ou explique objetivamente por que nao foi possivel executar.
+
+Atualize `docs/PROJECT-STATE.md` quando o estado atual, uma decisao, um risco, uma fragilidade, uma melhoria futura ou a proxima etapa mudar. Atualize `docs/ROADMAP.md` somente quando um item tiver sido realmente entregue e validado.
 
 ## 7. Decisoes e lacunas
 

@@ -8,18 +8,19 @@ Construir uma visao confiavel do projeto a partir de evidencias, combinando o qu
 
 ## Instrucao para a IA
 
-1. Leia `AGENTS.md`, `.sdd/EXECUTION-CONTRACT.md`, `.sdd/PROJECT-BRIEF.md`, `.sdd/MAP.md` e `.sdd/local/` por ultimo.
-2. Inspecione somente em modo leitura: arquivos de entrada, manifestos de dependencias, configuracoes, codigo-fonte, testes, documentacao e automacao de CI que existirem. Nao abra, imprima ou copie segredos.
-3. Identifique, com caminho de arquivo quando possivel:
+1. Leia `AGENTS.md`, `.sdd/EXECUTION-CONTRACT.md`, `.sdd/PROJECT-BRIEF.md`, `.sdd/MAP.md`, `docs/README.md`, todos os documentos ativos listados por ele e `.sdd/local/` por ultimo.
+2. Compare o contexto de produto e operacao documentado com o repositorio antes de inspecionar o codigo. Registre divergencias como evidencia, hipotese ou lacuna; nao sobrescreva uma decisao humana com uma inferencia tecnica.
+3. Inspecione somente em modo leitura: arquivos de entrada, manifestos de dependencias, configuracoes, codigo-fonte, testes, documentacao e automacao de CI que existirem. Nao abra, imprima ou copie segredos.
+4. Identifique, com caminho de arquivo quando possivel:
    - modulos e responsabilidades;
    - linguagens, frameworks e comandos de execucao e validacao;
    - fluxos relevantes, dados, integracoes e limites de seguranca;
    - dividas, duplicidades, configuracoes legadas e pontos que precisam de confirmacao humana.
-4. Compare as evidencias com `PROJECT-BRIEF.md`. O que o usuario escreveu sobre negocio ou prioridade prevalece sobre inferencia do codigo.
-5. Antes de editar qualquer arquivo, entregue um relatorio com quatro secoes: **Evidencias**, **Hipoteses**, **Lacunas para o usuario** e **Plano de preenchimento**. O plano deve listar os arquivos que serao alterados e como serao validados.
-6. Pare e espere aprovacao explicita.
-7. Depois da aprovacao, preencha `.sdd/MAP.md` usando fatos rastreaveis. Crie guias em `.sdd/knowledge/` somente para temas recorrentes ou de risco. Nao remova campos `PENDENTE` sem evidencia ou resposta do usuario.
-8. Se a atualizacao for relevante, crie uma pasta de demanda em `.sdd/features/<AAAA-MM-DD>-<slug>/`, use os templates e registre no `RECORD.md` o que foi confirmado e o que continua em aberto.
+5. Compare as evidencias com `PROJECT-BRIEF.md` e com os documentos ativos. O que o usuario escreveu sobre negocio ou prioridade prevalece sobre inferencia do codigo.
+6. Antes de editar qualquer arquivo, entregue um relatorio com cinco secoes: **Fase atual**, **Evidencias**, **Hipoteses**, **Lacunas para o usuario** e **Plano de preenchimento**. O plano deve listar os arquivos que serao alterados, inclusive documentos vivos, e como serao validados.
+7. Pare e espere aprovacao explicita.
+8. Depois da aprovacao, preencha `.sdd/MAP.md` usando fatos rastreaveis. Crie guias em `.sdd/knowledge/` somente para temas recorrentes ou de risco. Nao remova campos `PENDENTE` sem evidencia ou resposta do usuario.
+9. Se a atualizacao for relevante, crie uma pasta de demanda em `.sdd/features/<AAAA-MM-DD>-<slug>/`, use os templates e registre no `RECORD.md` o que foi confirmado, o que continua em aberto e quais documentos ativos foram atualizados.
 
 ## Perguntas que a IA deve fazer quando faltarem dados
 
