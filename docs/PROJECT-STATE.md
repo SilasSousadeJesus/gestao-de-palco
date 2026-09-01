@@ -6,7 +6,7 @@
 
 | Campo                     | Estado atual                                                |
 | ------------------------- | ----------------------------------------------------------- |
-| Ultima atualizacao        | 01/09/2026 (correcao de bloqueios tecnicos da Rodada 5)      |
+| Ultima atualizacao        | 01/09/2026 (CRUD de eventos e blocos concluido)              |
 | Fase atual                | Fase 4 - Tela de palco e timers concluida                   |
 | Software de produto       | Gestao local, blocos, console e preview implementados       |
 | Proxima etapa proposta    | Fase 5 - Mensagens e automacoes                             |
@@ -59,7 +59,8 @@
 - Pagina tecnica em `/sync-lab` para validar versao, conexao e recuperacao do estado.
 - Painel de gestao em `/`, com eventos, blocos, console e preview 16:9.
 - Tela HDMI em `/palco?evento=<id>`, com tempo gigante, pausa e atraso.
-- Mensagens manuais (temporaria e permanente) e limpeza de mensagem no console de gestao. Mensagens programadas e automacoes de atraso/sequencia de blocos ainda nao existem.
+- Mensagens manuais (temporaria e permanente) e limpeza de mensagem no console de gestao, com limite de 50 caracteres e aviso visivel. Mensagens programadas e automacoes de atraso/sequencia de blocos ainda nao existem.
+- Edicao (nome) e exclusao (com cascata e confirmacao) de eventos; edicao (nome e duracao) e exclusao de blocos, com icones de iniciar/parar por bloco substituindo o controle global de pausar/retomar. Reordenar blocos e fechar/reabrir evento por status ainda nao existem.
 
 ## Decisoes confirmadas
 
@@ -139,6 +140,12 @@
 - `npm run lint`, `npm run typecheck`, `npm run test:db` e `npm run build` passaram.
 - Verificacao visual automatizada com Playwright headless: criado evento e bloco de teste, iniciado o timer, enviada mensagem temporaria (confirmado que aparece gigante no preview e no palco e some sozinha apos 20s), enviada mensagem permanente com timer ativo (confirmado o dialogo de confirmacao e que a mensagem nao expira sozinha), limpeza de mensagem (confirmado retorno ao timer). Sem erros de console em nenhuma das duas telas; layout de 3 colunas do console preservado.
 - **Correcao pos-entrega:** o usuario testou manualmente no monitor de palco e encontrou o texto da mensagem usando o mesmo `font-size` gigante do timer, com letras cortadas na borda. Corrigido separando o estilo do texto da mensagem (`stage-message-text`) do estilo dos digitos do timer, sem alterar o tamanho do timer. Revalidado com as quatro validacoes automaticas e nova verificacao visual. Detalhe completo em `.sdd/features/2026-09-01-mensagens-console-gestao/RECORD.md`.
+
+## Evidencias do CRUD de eventos e blocos (01/09/2026)
+
+- `npm run lint`, `npm run typecheck`, `npm run test:db` (5/5) e `npm run build` passaram.
+- Verificacao visual e funcional com Playwright: renomear evento, editar bloco (nome e duracao), iniciar/parar bloco por icone (confirmado que "Pausar"/"Retomar" nao existem mais e "Limpar palco" continua), excluir bloco, excluir evento com confirmacao (cascata confirmada por `GET` retornando `404` apos a exclusao), rolagem da lista de eventos com 11 itens. Detalhe completo em `.sdd/features/2026-09-01-crud-eventos-blocos/RECORD.md`.
+- Corrigido de forma incidental um bug pre-existente: "Tempo Decorrido" mostrava `-1:-1:-1` no instante inicial apos iniciar um bloco, antes do primeiro tick do relogio local.
 
 ## Regra de manutencao
 

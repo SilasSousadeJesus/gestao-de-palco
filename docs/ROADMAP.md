@@ -56,14 +56,14 @@
 
 **Objetivo:** permitir preparar e controlar um culto manualmente.
 
-- [x] Criar e abrir eventos; o encerramento por controle visual fica pendente.
-- [x] Listar historico basico de eventos.
-- [x] Criar blocos e remover blocos pela API; edicao e reordenacao ficam pendentes.
+- [x] Criar, editar (nome) e excluir eventos, com confirmacao e exclusao em cascata dos dados relacionados; o encerramento por status/controle visual fica pendente.
+- [x] Listar historico basico de eventos, com rolagem acima de 5 itens.
+- [x] Criar, editar (nome e duracao) e excluir blocos pela interface; reordenacao fica pendente.
 - [x] Mostrar tempo total planejado do evento.
-- [x] Implementar console ao vivo com bloco atual e controles de timer.
+- [x] Implementar console ao vivo com bloco atual e controle de iniciar/parar por icone em cada bloco.
 - [x] Adicionar preview 16:9 permanente com o mesmo componente do palco.
 
-**Pronto quando:** o operador prepara um culto e acompanha no preview o mesmo timer que seria exibido no monitor de palco. A base foi entregue; os controles de edicao e encerramento serao completados junto aos fluxos de conclusao da Fase 7.
+**Pronto quando:** o operador prepara um culto e acompanha no preview o mesmo timer que seria exibido no monitor de palco. A base, a edicao e a exclusao de eventos/blocos foram entregues (01/09/2026); o encerramento por status sera completado junto aos fluxos de conclusao da Fase 7.
 
 ## Fase 4 - Tela de palco e timers
 

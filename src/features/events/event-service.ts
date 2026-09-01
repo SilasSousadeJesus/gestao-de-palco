@@ -69,6 +69,18 @@ export function updateEventStatus(database: Database.Database, eventId: string, 
   return result.changes ? getEvent(database, eventId) : null;
 }
 
+export function updateEventTitle(database: Database.Database, eventId: string, title: string) {
+  const trimmed = title.trim();
+  if (!trimmed) throw new Error("Informe o nome do evento.");
+  const result = database.prepare("update events set title = ?, updated_at = ? where id = ?").run(trimmed, Date.now(), eventId);
+  return result.changes ? getEvent(database, eventId) : null;
+}
+
+export function deleteEvent(database: Database.Database, eventId: string) {
+  const result = database.prepare("delete from events where id = ?").run(eventId);
+  return result.changes > 0;
+}
+
 export function createBlock(database: Database.Database, eventId: string, input: { title: string; durationSeconds: number }) {
   const title = input.title.trim();
   if (!title || !Number.isInteger(input.durationSeconds) || input.durationSeconds < 1) throw new Error("Bloco invalido.");
@@ -84,4 +96,20 @@ export function createBlock(database: Database.Database, eventId: string, input:
 export function deleteBlock(database: Database.Database, eventId: string, blockId: string) {
   const result = database.prepare("delete from time_blocks where id = ? and event_id = ?").run(blockId, eventId);
   return result.changes > 0;
+}
+
+export function updateBlock(
+  database: Database.Database,
+  eventId: string,
+  blockId: string,
+  input: { title?: string; durationSeconds?: number },
+) {
+  const current = listBlocks(database, eventId).find((block) => block.id === blockId);
+  if (!current) return null;
+  const title = input.title !== undefined ? input.title.trim() : current.title;
+  const durationSeconds = input.durationSeconds ?? current.durationSeconds;
+  if (!title || !Number.isInteger(durationSeconds) || durationSeconds < 1) throw new Error("Bloco invalido.");
+  database.prepare("update time_blocks set title = ?, duration_seconds = ?, updated_at = ? where id = ? and event_id = ?")
+    .run(title, durationSeconds, Date.now(), blockId, eventId);
+  return { ...current, title, durationSeconds };
 }
