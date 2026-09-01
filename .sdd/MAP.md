@@ -47,7 +47,7 @@
 - O SQLite foi escolhido para um unico PC; nao usar o mesmo arquivo simultaneamente por pasta de sincronizacao em nuvem.
 - A fundacao nao libera acesso pela LAN ainda; isso entra na Fase 6 com PIN/login e regras de firewall.
 - O hub de SSE e local ao processo. Nao escalar para varias instancias Next sem substituir essa notificacao por um barramento compartilhado.
-- A Rodada 5 deve ser reavaliada porque commits recentes foram removidos por quebra de layout.
+- A Rodada 5 deve ser reavaliada porque commits recentes foram removidos por quebra de layout. Os bloqueios de validacao ja foram corrigidos em 01/09/2026; falta a interface de mensagens e as automacoes.
 
 ## Regra obrigatoria de documentacao
 
@@ -55,10 +55,8 @@ Toda alteracao futura deve atualizar os documentos ativos afetados, o roadmap e 
 
 ## Estado tecnico bloqueante
 
-- `npm run lint` passa.
-- `npm run typecheck` e `npm run build` falham no parser de `durationSeconds` das mensagens.
-- `npm run test:db` falha porque o teste do snapshot nao contempla `activeMessageContent` e `messageExpiresAt`.
-- Antes de escrever qualquer funcionalidade nova, corrigir esses tres pontos e registrar a evidencia no `RECORD.md` da demanda.
+- `npm run lint`, `npm run typecheck`, `npm run test:db` e `npm run build` passam (corrigido em 01/09/2026, ver `.sdd/features/2026-09-01-corrige-bloqueios-rodada-5/RECORD.md`).
+- Nao ha mais bloqueio tecnico de validacao para novas funcionalidades. A interface de mensagens e as automacoes da Rodada 5 continuam pendentes de implementacao.
 
 ## Lacunas a confirmar com o usuario
 

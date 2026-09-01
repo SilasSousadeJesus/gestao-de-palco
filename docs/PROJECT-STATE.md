@@ -6,7 +6,7 @@
 
 | Campo                     | Estado atual                                                |
 | ------------------------- | ----------------------------------------------------------- |
-| Ultima atualizacao        | 01/09/2026                                                  |
+| Ultima atualizacao        | 01/09/2026 (correcao de bloqueios tecnicos da Rodada 5)      |
 | Fase atual                | Fase 4 - Tela de palco e timers concluida                   |
 | Software de produto       | Gestao local, blocos, console e preview implementados       |
 | Proxima etapa proposta    | Fase 5 - Mensagens e automacoes                             |
@@ -24,15 +24,20 @@
 - `npm run test:db` falhou porque o teste de snapshot nao foi atualizado para os campos de mensagem.
 - As migrations `0002_superb_ikaris.sql` (tempo decorrido) e `0003_wonderful_nick_fury.sql` (estado base de mensagem) existem e foram aplicadas localmente.
 - A Rodada 5 permanece parcial: dominio e schema possuem base de mensagem, mas a interface de gestao e automacoes nao foram entregues nem validadas.
-- O projeto esta bloqueado para novas funcionalidades ate corrigir tipagem, testes e build.
+
+## Correcao de bloqueios tecnicos em 01/09/2026
+
+- Corrigido o narrowing de tipo de `durationSeconds` em `src/app/api/events/[eventId]/stage/commands/route.ts` (`Number.isInteger` nao e um type guard no TypeScript).
+- Atualizado `tests/stage-state.test.ts` para esperar `activeMessageContent` e `messageExpiresAt` no snapshot, e adicionada regressao de pausa/retomada do tempo decorrido.
+- `npm run lint`, `npm run typecheck`, `npm run test:db` (5/5) e `npm run build` passaram. Evidencia completa em `.sdd/features/2026-09-01-corrige-bloqueios-rodada-5/RECORD.md`.
+- O projeto nao esta mais bloqueado para novas funcionalidades por falha de validacao, mas a interface de mensagens e as automacoes da Rodada 5 continuam pendentes de implementacao.
 
 ## Retomada obrigatoria da Rodada 5
 
-1. Corrigir o parser de `durationSeconds` das mensagens.
-2. Atualizar testes para os campos de mensagem e adicionar regressao de pausa/retomada do tempo decorrido.
-3. Fazer lint, tipagem, testes e build passarem.
-4. Implementar e validar controles de mensagem temporaria, permanente e limpeza no console.
-5. Somente depois implementar agendamento e aviso automatico de atraso.
+1. Implementar e validar controles de mensagem temporaria, permanente e limpeza no console de gestao (`management-client.tsx`), que hoje nao tem nenhum controle de mensagem.
+2. Adicionar confirmacao antes de colocar mensagem permanente no palco com timer ativo, conforme `docs/PRODUCT.md`.
+3. Somente depois implementar agendamento e aviso automatico de atraso.
+4. Implementar sequencia automatica de blocos com confirmacao humana.
 
 ## O que ja existe
 

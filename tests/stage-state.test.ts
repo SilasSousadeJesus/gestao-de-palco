@@ -69,6 +69,8 @@ test("comandos de palco persistem versao e sao idempotentes", () => {
     version: 1,
     eventElapsedSeconds: 0,
     activeBlockId: "bloco",
+    activeMessageContent: null,
+    messageExpiresAt: null,
     mode: "running",
     startedAt: 1_000,
     pausedAt: null,
@@ -105,4 +107,46 @@ test("comandos com versao desatualizada nao alteram o palco", () => {
       error instanceof StageStateError && error.code === "version_conflict",
   );
   assert.equal(readStageSnapshot(database, "evento").version, 1);
+});
+
+test("tempo decorrido persiste corretamente apos um ciclo de pausa e retomada", () => {
+  const database = createDatabase();
+  applyStageCommand(
+    database,
+    "evento",
+    { blockId: "bloco", commandId: "inicio", expectedVersion: 0, type: "start" },
+    0,
+  );
+
+  const paused = applyStageCommand(
+    database,
+    "evento",
+    { commandId: "pausa", expectedVersion: 1, type: "pause" },
+    10_000,
+  );
+
+  assert.equal(paused.mode, "paused");
+  assert.equal(paused.eventElapsedSeconds, 10);
+  assert.equal(paused.pausedElapsedSeconds, 10);
+
+  const resumed = applyStageCommand(
+    database,
+    "evento",
+    { commandId: "retomada", expectedVersion: 2, type: "resume" },
+    15_000,
+  );
+
+  assert.equal(resumed.mode, "running");
+  assert.equal(resumed.eventElapsedSeconds, 0);
+  assert.equal(resumed.startedAt, 5_000);
+
+  const pausedAgain = applyStageCommand(
+    database,
+    "evento",
+    { commandId: "pausa-2", expectedVersion: 3, type: "pause" },
+    25_000,
+  );
+
+  assert.equal(pausedAgain.mode, "paused");
+  assert.equal(pausedAgain.eventElapsedSeconds, 20);
 });

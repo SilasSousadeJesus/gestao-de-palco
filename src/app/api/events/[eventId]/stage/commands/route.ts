@@ -31,7 +31,9 @@ function parseCommand(value: unknown): StageCommand | null {
     !stageCommandTypes.includes(type as StageCommand["type"]) ||
     (blockId !== undefined && (typeof blockId !== "string" || blockId.length === 0)) ||
     (message !== undefined && typeof message !== "string") ||
-    (durationSeconds !== undefined && durationSeconds !== null && (!Number.isInteger(durationSeconds) || durationSeconds < 1)) ||
+    (durationSeconds !== undefined &&
+      durationSeconds !== null &&
+      (typeof durationSeconds !== "number" || !Number.isInteger(durationSeconds) || durationSeconds < 1)) ||
     (expectedVersion !== undefined &&
       (typeof expectedVersion !== "number" ||
         !Number.isInteger(expectedVersion) ||

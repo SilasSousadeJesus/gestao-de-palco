@@ -81,7 +81,7 @@
 
 > **PENDENTE DE REAVALIACAO:** commits da tentativa inicial foram removidos por quebra de layout. Reconciliar estado real antes de retomar.
 
-> **ESTADO APOS AUDITORIA:** a base de schema e dominio de mensagens existe, mas a interface, automacoes e validacao nao foram entregues. O projeto esta bloqueado ate `typecheck`, `test:db` e `build` voltarem a passar.
+> **ESTADO APOS AUDITORIA (01/09/2026):** a base de schema e dominio de mensagens existe e os bloqueios de `typecheck`, `test:db` e `build` foram corrigidos (ver `.sdd/features/2026-09-01-corrige-bloqueios-rodada-5/RECORD.md`). A interface de mensagens no console de gestao e as automacoes abaixo ainda nao foram entregues.
 
 **Objetivo:** comunicar orientacoes ao palco sem tirar o controle do operador.
 
