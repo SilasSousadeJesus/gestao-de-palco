@@ -33,7 +33,9 @@ export function useStageSnapshot(eventId: string | null) {
 
     const acceptSnapshot = (incoming: StageSnapshot) => {
       setSnapshot((current) =>
-        !current || incoming.version >= current.version ? incoming : current,
+        !current || current.eventId !== incoming.eventId || incoming.version >= current.version
+          ? incoming
+          : current,
       );
     };
 

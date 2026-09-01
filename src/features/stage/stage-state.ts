@@ -181,6 +181,16 @@ export function applyStageCommand(
       }
     }
 
+    if (command.type === "start") {
+      database
+        .prepare(
+          `update stage_states set active_block_id = null, mode = 'idle', started_at = null,
+           paused_at = null, paused_elapsed_seconds = null, version = version + 1, updated_at = ?
+           where event_id <> ? and mode in ('running', 'paused')`,
+        )
+        .run(now, eventId);
+    }
+
     const changed = nextSnapshot(current, command, now);
     const snapshot: StageSnapshot = {
       eventId,
