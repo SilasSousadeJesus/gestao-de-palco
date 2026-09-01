@@ -150,3 +150,41 @@ test("tempo decorrido persiste corretamente apos um ciclo de pausa e retomada", 
   assert.equal(pausedAgain.mode, "paused");
   assert.equal(pausedAgain.eventElapsedSeconds, 20);
 });
+
+test("limpar palco preserva o tempo decorrido por padrao, mas zera quando resetElapsed e pedido", () => {
+  const database = createDatabase();
+  applyStageCommand(
+    database,
+    "evento",
+    { blockId: "bloco", commandId: "inicio", expectedVersion: 0, type: "start" },
+    0,
+  );
+
+  const clearedWithoutReset = applyStageCommand(
+    database,
+    "evento",
+    { commandId: "limpar-1", expectedVersion: 1, type: "clear" },
+    10_000,
+  );
+
+  assert.equal(clearedWithoutReset.mode, "idle");
+  assert.equal(clearedWithoutReset.activeBlockId, null);
+  assert.equal(clearedWithoutReset.eventElapsedSeconds, 10);
+
+  applyStageCommand(
+    database,
+    "evento",
+    { blockId: "bloco", commandId: "inicio-2", expectedVersion: 2, type: "start" },
+    12_000,
+  );
+
+  const clearedWithReset = applyStageCommand(
+    database,
+    "evento",
+    { commandId: "limpar-2", expectedVersion: 3, type: "clear", resetElapsed: true },
+    20_000,
+  );
+
+  assert.equal(clearedWithReset.mode, "idle");
+  assert.equal(clearedWithReset.eventElapsedSeconds, 0);
+});

@@ -36,6 +36,8 @@
 
 - `management-client.tsx` ganhou um formulario de mensagem no console ao vivo: enviar temporaria (20s), enviar permanente com confirmacao quando o timer esta ativo, e limpar mensagem.
 - Validado com `lint`, `typecheck`, `test:db`, `build` e uma verificacao visual automatizada (Playwright headless) cobrindo gestao e palco simultaneamente: mensagem temporaria some sozinha apos 20s, mensagem permanente exige confirmacao e nao expira sozinha, limpar mensagem restaura o timer, sem erros de console e sem quebra do layout de 3 colunas. Evidencia em `.sdd/features/2026-09-01-mensagens-console-gestao/RECORD.md`.
+- Exclusao de evento e bloco passou a usar SweetAlert2 (`confirmDelete` em `src/lib/confirm-dialog.ts`), reutilizavel para futuros componentes com exclusao. Evidencia em `.sdd/features/2026-09-01-confirmacao-sweetalert2/RECORD.md`.
+- O botao "Limpar palco" agora tambem zera o tempo decorrido do evento (o icone de parar um bloco individualmente nao zera). O layout do console de gestao mudou: preview ao vivo passou a ocupar uma linha propria em largura total, abaixo dos 3 cards do topo (Eventos, Evento Aberto e um novo card reservado "Em breve"). Evidencia em `.sdd/features/2026-09-01-reset-tempo-e-layout-preview/RECORD.md`.
 
 ## Retomada obrigatoria da Rodada 5
 

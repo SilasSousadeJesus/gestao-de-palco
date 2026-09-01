@@ -167,12 +167,18 @@ export function ManagementClient() {
     await loadEvents();
   };
 
-  const command = async (type: "start" | "clear", blockId?: string) => {
+  const command = async (type: "start" | "clear", blockId?: string, resetElapsed?: boolean) => {
     if (!active || !snapshot) return;
     const response = await fetch(`/api/events/${active.id}/stage/commands`, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ commandId: crypto.randomUUID(), expectedVersion: snapshot.version, type, ...(blockId ? { blockId } : {}) }),
+      body: JSON.stringify({
+        commandId: crypto.randomUUID(),
+        expectedVersion: snapshot.version,
+        type,
+        ...(blockId ? { blockId } : {}),
+        ...(resetElapsed ? { resetElapsed: true } : {}),
+      }),
     });
     if (response.ok) setSnapshot(await response.json());
   };
@@ -317,7 +323,7 @@ export function ManagementClient() {
                 })}
               </div>
               <div className="live-controls">
-                <button onClick={() => void command("clear")}>Limpar palco</button>
+                <button onClick={() => void command("clear", undefined, true)}>Limpar palco</button>
               </div>
               <form className="message-form" onSubmit={(event) => { event.preventDefault(); void sendMessage(false); }}>
                 <input value={messageText} onChange={(event) => onMessageTextChange(event.target.value)} placeholder="Mensagem para o palco" />
@@ -333,6 +339,9 @@ export function ManagementClient() {
             <p>Crie ou selecione um evento para iniciar a preparacao.</p>
           )}
         </section>
+        <aside className="placeholder-panel">
+          <p className="eyebrow">EM BREVE</p>
+        </aside>
         <section className="preview-panel">
           <p className="eyebrow">PREVIEW AO VIVO</p>
           <StagePresentation snapshot={snapshot} block={currentBlock} />

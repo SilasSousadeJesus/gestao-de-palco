@@ -23,4 +23,4 @@
 
 ## Documentos ativos atualizados
 
-- Nenhum documento ativo precisou de atualizacao de conteudo alem deste registro: a funcionalidade de exclusao ja estava documentada como entregue em `docs/PROJECT-STATE.md`/`docs/ROADMAP.md` pela demanda `2026-09-01-crud-eventos-blocos`; esta demanda apenas troca a implementacao do dialogo de confirmacao, sem mudar o comportamento observavel pelo usuario (ainda pede confirmacao antes de excluir).
+- `docs/PROJECT-STATE.md`: adicionada uma linha em "O que ja existe" (junto com a demanda seguinte, `reset-tempo-e-layout-preview`) mencionando que a exclusao usa SweetAlert2 via `confirmDelete`.

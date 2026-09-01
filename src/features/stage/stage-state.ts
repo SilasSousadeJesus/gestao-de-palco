@@ -25,6 +25,7 @@ export type StageCommand = {
   message?: string;
   durationSeconds?: number | null;
   expectedVersion?: number;
+  resetElapsed?: boolean;
 };
 
 type StageStateRow = {
@@ -143,7 +144,7 @@ function nextSnapshot(
       };
     case "clear":
       return {
-        eventElapsedSeconds: accumulated,
+        eventElapsedSeconds: command.resetElapsed ? 0 : accumulated,
         activeBlockId: null,
         mode: "idle",
         startedAt: null,

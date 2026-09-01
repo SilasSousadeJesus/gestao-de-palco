@@ -22,6 +22,7 @@ function parseCommand(value: unknown): StageCommand | null {
   const blockId = input.blockId;
   const message = input.message;
   const durationSeconds = input.durationSeconds;
+  const resetElapsed = input.resetElapsed;
 
   if (
     typeof commandId !== "string" ||
@@ -37,7 +38,8 @@ function parseCommand(value: unknown): StageCommand | null {
     (expectedVersion !== undefined &&
       (typeof expectedVersion !== "number" ||
         !Number.isInteger(expectedVersion) ||
-        expectedVersion < 0))
+        expectedVersion < 0)) ||
+    (resetElapsed !== undefined && typeof resetElapsed !== "boolean")
   ) {
     return null;
   }
@@ -49,6 +51,7 @@ function parseCommand(value: unknown): StageCommand | null {
     ...(message === undefined ? {} : { message }),
     ...(durationSeconds === undefined ? {} : { durationSeconds }),
     ...(expectedVersion === undefined ? {} : { expectedVersion }),
+    ...(resetElapsed === undefined ? {} : { resetElapsed }),
   };
 }
 
