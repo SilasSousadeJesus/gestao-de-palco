@@ -4,7 +4,7 @@
 
 | Campo                    | Valor                                                                   |
 | ------------------------ | ----------------------------------------------------------------------- |
-| Estado do mapeamento     | Fase 3 concluida em 01/09/2026                                          |
+| Estado do mapeamento     | Fase 4 concluida em 01/09/2026                                          |
 | Arquitetura              | Aplicacao Next.js auto-hospedada em um unico PC, com SQLite local       |
 | Linguagens e frameworks  | TypeScript, Next.js 16, React 19, Drizzle ORM e SQLite                  |
 | Como executar localmente | `npm install`, `npm run db:migrate`, `npm run dev`                      |

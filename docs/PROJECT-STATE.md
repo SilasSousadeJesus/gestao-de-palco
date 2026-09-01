@@ -7,9 +7,9 @@
 | Campo                     | Estado atual                                                |
 | ------------------------- | ----------------------------------------------------------- |
 | Ultima atualizacao        | 01/09/2026                                                  |
-| Fase atual                | Fase 3 - Eventos e console de gestao concluida              |
+| Fase atual                | Fase 4 - Tela de palco e timers concluida                   |
 | Software de produto       | Gestao local, blocos, console e preview implementados       |
-| Proxima etapa proposta    | Fase 4 - Tela de palco e timers                             |
+| Proxima etapa proposta    | Fase 5 - Mensagens e automacoes                             |
 | Proxima escrita de codigo | Exige demanda, plano aprovado e leitura documental completa |
 
 ## O que ja existe
@@ -26,7 +26,8 @@
 - APIs locais para consultar, comandar e receber estado por SSE.
 - Pagina tecnica em `/sync-lab` para validar versao, conexao e recuperacao do estado.
 - Painel de gestao em `/`, com eventos, blocos, console e preview 16:9.
-- Ainda nao existem tela HDMI em tela cheia, mensagens ou automacoes.
+- Tela HDMI em `/palco?evento=<id>`, com tempo gigante, pausa e atraso.
+- Ainda nao existem mensagens ou automacoes.
 
 ## Decisoes confirmadas
 

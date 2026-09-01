@@ -18,10 +18,10 @@
 - [x] Banco SQLite local e migracoes.
 - [ ] Inicializacao automatica no Windows.
 - [x] Tela de gestao e preview permanente.
-- [ ] Tela de palco em tela cheia.
+- [x] Tela de palco em tela cheia.
 - [x] Estado de palco versionado e sincronizacao local.
 - [x] Eventos e historico basico.
-- [ ] Timers positivos, pausa e contagem negativa.
+- [x] Timers positivos, pausa e contagem negativa.
 - [ ] Mensagens manuais, temporarias e permanentes.
 - [ ] Mensagens programadas e aviso automatico de atraso.
 - [ ] Sequencia de blocos com confirmacao.
@@ -69,9 +69,9 @@
 
 **Objetivo:** entregar leitura clara e correta para quem esta ministrando.
 
-- Criar modo tela cheia e kiosk para o monitor HDMI.
-- Exibir timer gigante positivo, pausado e negativo.
-- Exibir nome de bloco de forma discreta, se confirmado no produto.
+- [x] Criar rota de tela cheia para o monitor HDMI; kiosk automatico fica para a Fase 7.
+- [x] Exibir timer gigante positivo, pausado e negativo.
+- [x] Exibir nome do bloco de forma discreta.
 - Preservar contagem negativa enquanto a proxima etapa aguarda confirmacao.
 - Validar contraste, fontes e leitura a distancia em resolucao 16:9.
 
