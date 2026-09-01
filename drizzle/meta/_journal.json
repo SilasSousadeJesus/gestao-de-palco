@@ -15,6 +15,13 @@
       "when": 1788284690564,
       "tag": "0001_careless_roland_deschain",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1788290095097,
+      "tag": "0002_superb_ikaris",
+      "breakpoints": true
     }
   ]
 }

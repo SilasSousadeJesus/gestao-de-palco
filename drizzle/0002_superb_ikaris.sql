@@ -1,0 +1,1 @@
+ALTER TABLE `stage_states` ADD `event_elapsed_seconds` integer DEFAULT 0 NOT NULL;

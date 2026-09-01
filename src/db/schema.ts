@@ -54,6 +54,7 @@ export const stageStates = sqliteTable("stage_states", {
     .primaryKey()
     .references(() => events.id, { onDelete: "cascade" }),
   version: integer("version").notNull().default(0),
+  eventElapsedSeconds: integer("event_elapsed_seconds").notNull().default(0),
   activeBlockId: text("active_block_id").references(() => timeBlocks.id, {
     onDelete: "set null",
   }),

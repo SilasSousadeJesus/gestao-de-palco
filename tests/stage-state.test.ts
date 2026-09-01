@@ -67,6 +67,7 @@ test("comandos de palco persistem versao e sao idempotentes", () => {
   assert.deepEqual(first, {
     eventId: "evento",
     version: 1,
+    eventElapsedSeconds: 0,
     activeBlockId: "bloco",
     mode: "running",
     startedAt: 1_000,

@@ -7,6 +7,7 @@ export type StageCommandType = (typeof stageCommandTypes)[number];
 export type StageSnapshot = {
   eventId: string;
   version: number;
+  eventElapsedSeconds: number;
   activeBlockId: string | null;
   mode: "idle" | "running" | "paused";
   startedAt: number | null;
@@ -25,6 +26,7 @@ export type StageCommand = {
 type StageStateRow = {
   event_id: string;
   version: number;
+  event_elapsed_seconds: number;
   active_block_id: string | null;
   mode: StageSnapshot["mode"];
   started_at: number | null;
@@ -53,6 +55,7 @@ function toSnapshot(row: StageStateRow): StageSnapshot {
   return {
     eventId: row.event_id,
     version: row.version,
+    eventElapsedSeconds: row.event_elapsed_seconds,
     activeBlockId: row.active_block_id,
     mode: row.mode,
     startedAt: row.started_at,
@@ -65,7 +68,7 @@ function toSnapshot(row: StageStateRow): StageSnapshot {
 function getSnapshot(database: Database.Database, eventId: string): StageSnapshot {
   const row = database
     .prepare(
-      `select event_id, version, active_block_id, mode, started_at, paused_at,
+      `select event_id, version, event_elapsed_seconds, active_block_id, mode, started_at, paused_at,
         paused_elapsed_seconds, updated_at
        from stage_states where event_id = ?`,
     )
@@ -83,12 +86,17 @@ function nextSnapshot(
   command: StageCommand,
   now: number,
 ): Omit<StageSnapshot, "eventId" | "version"> {
+  const runningSeconds = current.mode === "running" && current.startedAt !== null
+    ? Math.max(0, Math.floor((now - current.startedAt) / 1000))
+    : 0;
+  const accumulated = current.eventElapsedSeconds + runningSeconds;
   switch (command.type) {
     case "start":
       if (!command.blockId) {
         throw new StageStateError("invalid_state", "Selecione um bloco antes de iniciar.");
       }
       return {
+        eventElapsedSeconds: accumulated,
         activeBlockId: command.blockId,
         mode: "running",
         startedAt: now,
@@ -102,6 +110,7 @@ function nextSnapshot(
       }
 
       return {
+        eventElapsedSeconds: accumulated,
         activeBlockId: current.activeBlockId,
         mode: "paused",
         startedAt: current.startedAt,
@@ -116,6 +125,7 @@ function nextSnapshot(
       }
 
       return {
+        eventElapsedSeconds: current.eventElapsedSeconds,
         activeBlockId: current.activeBlockId,
         mode: "running",
         startedAt: now - current.pausedElapsedSeconds * 1000,
@@ -125,6 +135,7 @@ function nextSnapshot(
       };
     case "clear":
       return {
+        eventElapsedSeconds: accumulated,
         activeBlockId: null,
         mode: "idle",
         startedAt: null,
@@ -201,12 +212,13 @@ export function applyStageCommand(
     database
       .prepare(
         `update stage_states
-         set version = ?, active_block_id = ?, mode = ?, started_at = ?, paused_at = ?,
+         set version = ?, event_elapsed_seconds = ?, active_block_id = ?, mode = ?, started_at = ?, paused_at = ?,
              paused_elapsed_seconds = ?, updated_at = ?
          where event_id = ?`,
       )
       .run(
         snapshot.version,
+        snapshot.eventElapsedSeconds,
         snapshot.activeBlockId,
         snapshot.mode,
         snapshot.startedAt,
