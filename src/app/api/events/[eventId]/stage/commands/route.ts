@@ -30,7 +30,7 @@ function parseCommand(value: unknown): StageCommand | null {
     typeof type !== "string" ||
     !stageCommandTypes.includes(type as StageCommand["type"]) ||
     (blockId !== undefined && (typeof blockId !== "string" || blockId.length === 0)) ||
-    (message !== undefined && typeof message !== "string") ||
+    (message !== undefined && (typeof message !== "string" || message.length > 50)) ||
     (durationSeconds !== undefined &&
       durationSeconds !== null &&
       (typeof durationSeconds !== "number" || !Number.isInteger(durationSeconds) || durationSeconds < 1)) ||

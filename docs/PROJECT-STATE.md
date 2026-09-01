@@ -138,6 +138,7 @@
 
 - `npm run lint`, `npm run typecheck`, `npm run test:db` e `npm run build` passaram.
 - Verificacao visual automatizada com Playwright headless: criado evento e bloco de teste, iniciado o timer, enviada mensagem temporaria (confirmado que aparece gigante no preview e no palco e some sozinha apos 20s), enviada mensagem permanente com timer ativo (confirmado o dialogo de confirmacao e que a mensagem nao expira sozinha), limpeza de mensagem (confirmado retorno ao timer). Sem erros de console em nenhuma das duas telas; layout de 3 colunas do console preservado.
+- **Correcao pos-entrega:** o usuario testou manualmente no monitor de palco e encontrou o texto da mensagem usando o mesmo `font-size` gigante do timer, com letras cortadas na borda. Corrigido separando o estilo do texto da mensagem (`stage-message-text`) do estilo dos digitos do timer, sem alterar o tamanho do timer. Revalidado com as quatro validacoes automaticas e nova verificacao visual. Detalhe completo em `.sdd/features/2026-09-01-mensagens-console-gestao/RECORD.md`.
 
 ## Regra de manutencao
 
