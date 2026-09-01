@@ -43,11 +43,12 @@
 
 ## Dividas e armadilhas conhecidas
 
-- A aplicacao ainda nao possui autenticacao, interface de evento, preview definitivo ou tela HDMI.
+- A aplicacao ainda nao possui autenticacao.
+- Mensagens programadas, aviso automatico de atraso e sequencia automatica de blocos ainda nao existem; mensagens manuais (temporaria, permanente, limpeza) foram entregues em 01/09/2026.
 - O SQLite foi escolhido para um unico PC; nao usar o mesmo arquivo simultaneamente por pasta de sincronizacao em nuvem.
 - A fundacao nao libera acesso pela LAN ainda; isso entra na Fase 6 com PIN/login e regras de firewall.
 - O hub de SSE e local ao processo. Nao escalar para varias instancias Next sem substituir essa notificacao por um barramento compartilhado.
-- A Rodada 5 deve ser reavaliada porque commits recentes foram removidos por quebra de layout. Os bloqueios de validacao ja foram corrigidos em 01/09/2026; falta a interface de mensagens e as automacoes.
+- A Rodada 5 foi parcialmente retomada em 01/09/2026: bloqueios de validacao corrigidos e mensagens manuais entregues e validadas visualmente. Falta agendamento, aviso de atraso e sequencia de blocos.
 
 ## Regra obrigatoria de documentacao
 

@@ -22,7 +22,7 @@
 - [x] Estado de palco versionado e sincronizacao local.
 - [x] Eventos e historico basico.
 - [x] Timers positivos, pausa e contagem negativa.
-- [ ] Mensagens manuais, temporarias e permanentes.
+- [x] Mensagens manuais, temporarias e permanentes.
 - [ ] Mensagens programadas e aviso automatico de atraso.
 - [ ] Sequencia de blocos com confirmacao.
 - [ ] Acesso por tablet/notebook, PIN ou login e QR Code.
@@ -81,7 +81,7 @@
 
 > **PENDENTE DE REAVALIACAO:** commits da tentativa inicial foram removidos por quebra de layout. Reconciliar estado real antes de retomar.
 
-> **ESTADO APOS AUDITORIA (01/09/2026):** a base de schema e dominio de mensagens existe e os bloqueios de `typecheck`, `test:db` e `build` foram corrigidos (ver `.sdd/features/2026-09-01-corrige-bloqueios-rodada-5/RECORD.md`). A interface de mensagens no console de gestao e as automacoes abaixo ainda nao foram entregues.
+> **ESTADO APOS AUDITORIA (01/09/2026):** os bloqueios de `typecheck`, `test:db` e `build` foram corrigidos (ver `.sdd/features/2026-09-01-corrige-bloqueios-rodada-5/RECORD.md`). Os controles de mensagem manual (temporaria, permanente e limpeza) foram implementados e validados em `.sdd/features/2026-09-01-mensagens-console-gestao/RECORD.md`. As automacoes abaixo (mensagens programadas, aviso de atraso, sequencia de blocos) ainda nao foram entregues.
 
 **Objetivo:** comunicar orientacoes ao palco sem tirar o controle do operador.
 

@@ -32,11 +32,16 @@
 - `npm run lint`, `npm run typecheck`, `npm run test:db` (5/5) e `npm run build` passaram. Evidencia completa em `.sdd/features/2026-09-01-corrige-bloqueios-rodada-5/RECORD.md`.
 - O projeto nao esta mais bloqueado para novas funcionalidades por falha de validacao, mas a interface de mensagens e as automacoes da Rodada 5 continuam pendentes de implementacao.
 
+## Controles de mensagem manual implementados em 01/09/2026
+
+- `management-client.tsx` ganhou um formulario de mensagem no console ao vivo: enviar temporaria (20s), enviar permanente com confirmacao quando o timer esta ativo, e limpar mensagem.
+- Validado com `lint`, `typecheck`, `test:db`, `build` e uma verificacao visual automatizada (Playwright headless) cobrindo gestao e palco simultaneamente: mensagem temporaria some sozinha apos 20s, mensagem permanente exige confirmacao e nao expira sozinha, limpar mensagem restaura o timer, sem erros de console e sem quebra do layout de 3 colunas. Evidencia em `.sdd/features/2026-09-01-mensagens-console-gestao/RECORD.md`.
+
 ## Retomada obrigatoria da Rodada 5
 
-1. Implementar e validar controles de mensagem temporaria, permanente e limpeza no console de gestao (`management-client.tsx`), que hoje nao tem nenhum controle de mensagem.
-2. Adicionar confirmacao antes de colocar mensagem permanente no palco com timer ativo, conforme `docs/PRODUCT.md`.
-3. Somente depois implementar agendamento e aviso automatico de atraso.
+1. ~~Implementar e validar controles de mensagem temporaria, permanente e limpeza no console de gestao~~ — concluido em 01/09/2026.
+2. Implementar mensagens programadas relativas ao inicio de evento ou bloco.
+3. Configurar aviso automatico a cada minuto de tempo negativo.
 4. Implementar sequencia automatica de blocos com confirmacao humana.
 
 ## O que ja existe
@@ -54,7 +59,7 @@
 - Pagina tecnica em `/sync-lab` para validar versao, conexao e recuperacao do estado.
 - Painel de gestao em `/`, com eventos, blocos, console e preview 16:9.
 - Tela HDMI em `/palco?evento=<id>`, com tempo gigante, pausa e atraso.
-- Ainda nao existem mensagens ou automacoes.
+- Mensagens manuais (temporaria e permanente) e limpeza de mensagem no console de gestao. Mensagens programadas e automacoes de atraso/sequencia de blocos ainda nao existem.
 
 ## Decisoes confirmadas
 
@@ -128,6 +133,11 @@
 
 - O painel permite criar evento, adicionar bloco e iniciar o bloco no estado sincronizado.
 - `npm run lint`, `npm run typecheck`, `npm run test:db` e `npm run build` passaram.
+
+## Evidencias da Fase 5 (mensagens manuais, 01/09/2026)
+
+- `npm run lint`, `npm run typecheck`, `npm run test:db` e `npm run build` passaram.
+- Verificacao visual automatizada com Playwright headless: criado evento e bloco de teste, iniciado o timer, enviada mensagem temporaria (confirmado que aparece gigante no preview e no palco e some sozinha apos 20s), enviada mensagem permanente com timer ativo (confirmado o dialogo de confirmacao e que a mensagem nao expira sozinha), limpeza de mensagem (confirmado retorno ao timer). Sem erros de console em nenhuma das duas telas; layout de 3 colunas do console preservado.
 
 ## Regra de manutencao
 
