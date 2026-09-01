@@ -378,9 +378,9 @@ export function ManagementClient() {
                 <input value={messageText} onChange={(event) => onMessageTextChange(event.target.value)} placeholder="Mensagem para o palco" />
                 {messageLimitHit && <small className="message-limit-warning">Limite de 50 caracteres atingido.</small>}
                 <div className="message-actions">
-                  <button type="submit">Enviar temporaria (20s)</button>
-                  <button type="button" onClick={() => void sendMessage(true)}>Enviar permanente</button>
-                  <button type="button" onClick={() => void clearMessage()}>Limpar mensagem</button>
+                  <button type="submit" title="Enviar mensagem temporaria, some sozinha apos 20 segundos">Temporaria</button>
+                  <button type="button" title="Enviar mensagem permanente, fica ate ser limpa" onClick={() => void sendMessage(true)}>Permanente</button>
+                  <button type="button" title="Limpar a mensagem do palco" onClick={() => void clearMessage()}>Limpar</button>
                 </div>
               </form>
             </>
@@ -391,31 +391,33 @@ export function ManagementClient() {
         <aside className="report-panel">
           <p className="eyebrow">RELATORIO DE BLOCOS</p>
           {active ? (
-            <table>
-              <thead>
-                <tr><th>Nome</th><th>Tempo</th><th>Atraso</th></tr>
-              </thead>
-              <tbody>
-                {blockReport.map(({ block, hasRun, delaySeconds }) => (
-                  <tr key={block.id}>
-                    <td>{block.title}</td>
-                    <td>{minutes(block.durationSeconds)}</td>
-                    <td className={hasRun ? delayClass(delaySeconds) : ""}>{hasRun ? formatDelay(delaySeconds) : "—"}</td>
+            <div className="report-table-wrap">
+              <table>
+                <thead>
+                  <tr><th>Nome</th><th>Tempo</th><th>Atraso</th></tr>
+                </thead>
+                <tbody>
+                  {blockReport.map(({ block, hasRun, delaySeconds }) => (
+                    <tr key={block.id}>
+                      <td>{block.title}</td>
+                      <td>{minutes(block.durationSeconds)}</td>
+                      <td className={hasRun ? delayClass(delaySeconds) : ""}>{hasRun ? formatDelay(delaySeconds) : "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td>Total</td>
+                    <td>{minutes(active.plannedSeconds)}</td>
+                    <td className={delayClass(totalDelaySeconds)}>{formatDelay(totalDelaySeconds)}</td>
                   </tr>
-                ))}
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td>Total</td>
-                  <td>{minutes(active.plannedSeconds)}</td>
-                  <td className={delayClass(totalDelaySeconds)}>{formatDelay(totalDelaySeconds)}</td>
-                </tr>
-                <tr>
-                  <td colSpan={2}>Planejado − Decorrido</td>
-                  <td className={delayClass(budgetSeconds)}>{formatDelay(budgetSeconds)}</td>
-                </tr>
-              </tfoot>
-            </table>
+                  <tr>
+                    <td colSpan={2}>Planejado − Decorrido</td>
+                    <td className={delayClass(budgetSeconds)}>{formatDelay(budgetSeconds)}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
           ) : (
             <p className="report-empty">Nenhum evento aberto.</p>
           )}
