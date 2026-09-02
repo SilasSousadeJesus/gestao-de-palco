@@ -371,9 +371,6 @@ export function ManagementClient() {
                   );
                 })}
               </div>
-              <div className="live-controls">
-                <button onClick={() => void command("clear", undefined, true)}>Limpar palco</button>
-              </div>
               <form className="message-form" onSubmit={(event) => { event.preventDefault(); void sendMessage(false); }}>
                 <input value={messageText} onChange={(event) => onMessageTextChange(event.target.value)} placeholder="Mensagem para o palco" />
                 {messageLimitHit && <small className="message-limit-warning">Limite de 50 caracteres atingido.</small>}
@@ -391,6 +388,7 @@ export function ManagementClient() {
         <section className="preview-panel">
           <p className="eyebrow">PREVIEW AO VIVO</p>
           <StagePresentation snapshot={snapshot} block={currentBlock} />
+          {active && <button onClick={() => void command("clear", undefined, true)}>Limpar palco</button>}
           <small>Versao {snapshot?.version ?? "-"} · {connection}</small>
         </section>
         <aside className="report-panel">
