@@ -388,7 +388,7 @@ export function ManagementClient() {
         <section className="preview-panel">
           <p className="eyebrow">PREVIEW AO VIVO</p>
           <StagePresentation snapshot={snapshot} block={currentBlock} />
-          {active && <button onClick={() => void command("clear", undefined, true)}>Limpar palco</button>}
+          {active && <button className="clear-stage-button" onClick={() => void command("clear", undefined, true)}>Limpar palco</button>}
           <small>Versao {snapshot?.version ?? "-"} · {connection}</small>
         </section>
         <aside className="report-panel">

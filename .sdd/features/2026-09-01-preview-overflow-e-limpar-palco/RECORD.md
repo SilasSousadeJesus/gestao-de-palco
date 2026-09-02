@@ -27,6 +27,17 @@
   - Screenshot confirma visualmente: preview com a mensagem de 50 "a"s quebrada em 2 linhas legiveis dentro da caixa, botao "Limpar palco" logo abaixo; palco com a mesma mensagem em fonte gigante, identica ao comportamento anterior.
   - Nenhum erro de console em nenhuma das duas paginas.
 
+## Ajuste pos-entrega: texto torto e botao ocupando a largura toda (01/09/2026)
+
+O usuario testou e mandou print mostrando que o texto da mensagem no preview corrigiu o overflow, mas ficou desalinhado (deslocado para a esquerda, "torto") em vez de centralizado; e que o botao "Limpar palco" (na nova posicao, dentro do card do preview) ocupava a largura inteira do card.
+
+Causas e correcoes em `src/app/globals.css`:
+
+- **Texto torto**: `.stage-presentation, .stage-empty` usa `display:grid; place-content:center`, mas o `justify-self` de cada item por padrao e `stretch`. Como o texto da mensagem tem `max-width` menor que a largura total da coluna, ele ficava mais estreito que a area do grid, porem ainda alinhado ao inicio (esquerda) em vez de centralizado — sobrava espaco vazio so do lado direito. Corrigido adicionando `justify-self:center` em `.stage-presentation.stage-preview strong.stage-message-text`. (A tela de palco ja tinha esse `justify-self:center` numa regra generica de `strong`, por isso nunca teve esse problema.)
+- **Botao ocupando tudo**: pelo mesmo motivo (`justify-self` padrao `stretch` num grid), o botao "Limpar palco" esticava para a largura toda do card. Corrigido com uma classe propria `.clear-stage-button { max-width:108.4px; justify-self:end; }` (valores exatos pedidos pelo usuario).
+
+Validacao: `lint`, `typecheck`, `test:db` (8/8) e `build` passaram. Verificado com Playwright: diferenca entre o centro do texto e o centro da caixa preta = 0px (antes, deslocado); largura do botao = 108px (108.4 arredondado), alinhado a direita (borda direita do botao coincide com a borda direita util do card).
+
 ## Documentos ativos consultados
 
 - `docs/PROJECT-STATE.md`.
