@@ -57,6 +57,7 @@ const formatDelay = (seconds: number) => {
 const delayClass = (seconds: number) => (seconds < 0 ? "is-late" : seconds > 0 ? "is-early" : "");
 
 const EVENT_TITLE_LIMIT = 20;
+const BLOCK_TITLE_LIMIT = 40;
 const makeLimitedChangeHandler = (limit: number, setValue: (value: string) => void, setLimitHit: (hit: boolean) => void) => (value: string) => {
   if (value.length > limit) {
     setValue(value.slice(0, limit));
@@ -73,6 +74,7 @@ export function ManagementClient() {
   const [title, setTitle] = useState("");
   const [titleLimitHit, setTitleLimitHit] = useState(false);
   const [blockTitle, setBlockTitle] = useState("");
+  const [blockTitleLimitHit, setBlockTitleLimitHit] = useState(false);
   const [blockMinutes, setBlockMinutes] = useState("30");
   const [messageText, setMessageText] = useState("");
   const [messageLimitHit, setMessageLimitHit] = useState(false);
@@ -82,6 +84,7 @@ export function ManagementClient() {
   const [editingEventTitleLimitHit, setEditingEventTitleLimitHit] = useState(false);
   const [editingBlockId, setEditingBlockId] = useState<string | null>(null);
   const [editingBlockTitle, setEditingBlockTitle] = useState("");
+  const [editingBlockTitleLimitHit, setEditingBlockTitleLimitHit] = useState(false);
   const [editingBlockMinutes, setEditingBlockMinutes] = useState("");
   const { snapshot, connection, setSnapshot } = useStageSnapshot(active?.id ?? null);
 
@@ -165,6 +168,7 @@ export function ManagementClient() {
       body: JSON.stringify({ title: blockTitle, durationSeconds: Number(blockMinutes) * 60 }),
     });
     setBlockTitle("");
+    setBlockTitleLimitHit(false);
     await openEvent(active.id);
     await loadEvents();
   };
@@ -172,6 +176,7 @@ export function ManagementClient() {
   const editBlockStart = (block: Block) => {
     setEditingBlockId(block.id);
     setEditingBlockTitle(block.title);
+    setEditingBlockTitleLimitHit(false);
     setEditingBlockMinutes(String(block.durationSeconds / 60));
   };
   const editBlockCancel = () => setEditingBlockId(null);
@@ -253,6 +258,8 @@ export function ManagementClient() {
   const onMessageTextChange = makeLimitedChangeHandler(50, setMessageText, setMessageLimitHit);
   const onTitleChange = makeLimitedChangeHandler(EVENT_TITLE_LIMIT, setTitle, setTitleLimitHit);
   const onEditingEventTitleChange = makeLimitedChangeHandler(EVENT_TITLE_LIMIT, setEditingEventTitle, setEditingEventTitleLimitHit);
+  const onBlockTitleChange = makeLimitedChangeHandler(BLOCK_TITLE_LIMIT, setBlockTitle, setBlockTitleLimitHit);
+  const onEditingBlockTitleChange = makeLimitedChangeHandler(BLOCK_TITLE_LIMIT, setEditingBlockTitle, setEditingBlockTitleLimitHit);
 
   const currentBlock = active?.blocks?.find((block) => block.id === snapshot?.activeBlockId);
   const elapsed = snapshot
@@ -331,9 +338,10 @@ export function ManagementClient() {
                 </strong>
               </div>
               <form className="block-form" onSubmit={addBlock}>
-                <input value={blockTitle} onChange={(event) => setBlockTitle(event.target.value)} placeholder="Nome do bloco" />
+                <input value={blockTitle} onChange={(event) => onBlockTitleChange(event.target.value)} placeholder="Nome do bloco" />
                 <input min="1" type="number" value={blockMinutes} onChange={(event) => setBlockMinutes(event.target.value)} />
                 <button>Adicionar bloco</button>
+                {blockTitleLimitHit && <small className="message-limit-warning block-title-warning">Limite de 40 caracteres atingido.</small>}
               </form>
               <div className="blocks">
                 {active.blocks?.map((block) => {
@@ -344,10 +352,11 @@ export function ManagementClient() {
                       className="block-edit-form"
                       onSubmit={(event) => { event.preventDefault(); void editBlockSave(block.id); }}
                     >
-                      <input autoFocus value={editingBlockTitle} onChange={(event) => setEditingBlockTitle(event.target.value)} />
+                      <input autoFocus value={editingBlockTitle} onChange={(event) => onEditingBlockTitleChange(event.target.value)} />
                       <input min="1" type="number" value={editingBlockMinutes} onChange={(event) => setEditingBlockMinutes(event.target.value)} />
                       <button type="submit" className="icon-button" title="Salvar" aria-label="Salvar bloco"><IconCheck /></button>
                       <button type="button" className="icon-button" title="Cancelar" aria-label="Cancelar edicao" onClick={editBlockCancel}><IconX /></button>
+                      {editingBlockTitleLimitHit && <small className="message-limit-warning event-edit-warning">Limite de 40 caracteres atingido.</small>}
                     </form>
                   ) : (
                     <article key={block.id} className={block.finishedAt ? "is-finished" : ""}>

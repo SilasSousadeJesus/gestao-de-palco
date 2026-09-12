@@ -87,9 +87,12 @@ export function deleteEvent(database: Database.Database, eventId: string) {
   return result.changes > 0;
 }
 
+const BLOCK_TITLE_MAX_LENGTH = 40;
+
 export function createBlock(database: Database.Database, eventId: string, input: { title: string; durationSeconds: number }) {
   const title = input.title.trim();
   if (!title || !Number.isInteger(input.durationSeconds) || input.durationSeconds < 1) throw new Error("Bloco invalido.");
+  if (title.length > BLOCK_TITLE_MAX_LENGTH) throw new Error(`Nome do bloco deve ter no maximo ${BLOCK_TITLE_MAX_LENGTH} caracteres.`);
   if (!getEvent(database, eventId)) return null;
   const position = (database.prepare("select count(*) as count from time_blocks where event_id = ?").get(eventId) as { count: number }).count;
   const now = Date.now();
@@ -115,6 +118,7 @@ export function updateBlock(
   const title = input.title !== undefined ? input.title.trim() : current.title;
   const durationSeconds = input.durationSeconds ?? current.durationSeconds;
   if (!title || !Number.isInteger(durationSeconds) || durationSeconds < 1) throw new Error("Bloco invalido.");
+  if (title.length > BLOCK_TITLE_MAX_LENGTH) throw new Error(`Nome do bloco deve ter no maximo ${BLOCK_TITLE_MAX_LENGTH} caracteres.`);
   database.prepare("update time_blocks set title = ?, duration_seconds = ?, updated_at = ? where id = ? and event_id = ?")
     .run(title, durationSeconds, Date.now(), blockId, eventId);
   return { ...current, title, durationSeconds };
