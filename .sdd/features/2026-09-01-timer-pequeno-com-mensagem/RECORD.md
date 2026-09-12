@@ -41,11 +41,33 @@ Correcao em `src/app/globals.css`:
 
 Validacao: `lint`, `typecheck`, `test:db` (8/8) e `build` passaram. Verificado com Playwright: no palco, `boxLeft` e `miniLeft` iguais (0px) e `miniWidth` de apenas 195px (nao mais 100% da tela), `text-align:left` computado — confirma que agora e a caixa E o texto que ficam no canto, nao so a caixa. Screenshot confirma visualmente o mini-timer firme no canto superior esquerdo em ambas as telas, maior e legivel.
 
+## Segundo ajuste pos-entrega: mini-timer colado demais no canto (01/09/2026)
+
+Apos a correcao anterior, o mini-timer ficou exatamente no canto (`top:0; left:0`), mas por ser `position:absolute`, esses valores posicionam o elemento na borda da caixa (padding box do container `position:relative`), **ignorando o padding do proprio container** — que so se aplica ao conteudo em fluxo normal, nao a elementos absolutamente posicionados. Resultado: o timer ficava colado na quina, sem nenhum respiro, mesmo o container tendo padding generoso para o resto do conteudo.
+
+Correcao em `src/app/globals.css`: `top`/`left` do `.stage-mini-timer` deixaram de ser `0` e passaram a ter um afastamento proprio, definido por contexto (ja que os tamanhos de tela sao muito diferentes):
+
+- Palco: `top:3rem; left:3rem;` (era `0`).
+- Preview: `top:1.25rem; left:1.25rem;` (era `0`).
+
+Validacao: `lint`, `typecheck`, `test:db` (8/8) e `build` passaram. Verificado com Playwright, medindo a distancia real entre a borda do mini-timer e a borda da caixa (nao so a posicao absoluta, para nao repetir o erro de verificacao anterior): palco com 48px de folga (topo e esquerda, = 3rem); preview com 20px de folga (= 1.25rem). Screenshot confirma visualmente o respiro nas duas telas.
+
+## Terceiro ajuste pos-entrega: timer mais afastado do canto (12/09/2026)
+
+O usuario pediu para o mini-timer ficar "mais para baixo e mais afastado da margem lateral quando tiver mensagem rolando" — o respiro de `top:3rem; left:3rem` (palco) e `top:1.25rem; left:1.25rem` (preview) do ajuste anterior ainda estava pequeno demais na opiniao do usuario.
+
+Correcao em `src/app/globals.css` (mesmas regras do ajuste anterior, so os valores de `top`/`left` aumentados):
+
+- Palco: `top:6rem; left:5rem;` (era `top:3rem; left:3rem;`).
+- Preview: `top:2.25rem; left:2rem;` (era `top:1.25rem; left:1.25rem;`).
+
+Validacao: `lint`, `typecheck`, `test:db` (8/8) e `build` passaram. Verificado com Playwright reaproveitando o script de medicao de folga (borda do mini-timer ate a borda do container, nao so a posicao absoluta): palco com 96px de folga no topo e 80px na lateral (= 6rem/5rem); preview com 36px no topo e 32px na lateral (= 2.25rem/2rem) — batendo exatamente com os novos valores de CSS. Screenshots confirmam visualmente o timer mais abaixo e mais afastado da lateral em ambas as telas, sem sobrepor a mensagem.
+
 ## Documentos ativos consultados
 
 - `docs/PRODUCT.md`, `docs/PROJECT-STATE.md`, `.sdd/knowledge/design-system.md`.
 
 ## Documentos ativos atualizados
 
-- `docs/PROJECT-STATE.md`: nota adicionada informando que a apresentacao de mensagem com timer pequeno agora corresponde ao que `docs/PRODUCT.md` ja descrevia.
+- `docs/PROJECT-STATE.md`: nota adicionada informando que a apresentacao de mensagem com timer pequeno agora corresponde ao que `docs/PRODUCT.md` ja descrevia, e depois atualizada de novo com o novo afastamento do mini-timer.
 - `.sdd/knowledge/design-system.md`: adicionada a licao sobre nao usar seletores genericos compartilhados quando palco e preview tem escalas de tela muito diferentes (o mesmo padrao ja registrado para `.stage-message-text`, agora reforcado com o mini-timer).
