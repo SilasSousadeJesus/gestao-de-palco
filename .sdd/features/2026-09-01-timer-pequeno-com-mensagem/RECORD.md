@@ -26,6 +26,21 @@
   - Screenshots confirmam visualmente o mini-timer no canto superior esquerdo em ambas as telas, sem sobrepor ou distorcer o texto da mensagem.
   - Nenhum erro de console em nenhuma das duas paginas.
 
+## Ajuste pos-entrega: posicao errada no palco e tamanho pequeno demais (01/09/2026)
+
+O usuario testou de verdade e mandou print mostrando que, no palco, o mini-timer aparecia centralizado no topo (nao no canto esquerdo), e que em ambas as telas ele ficava muito pequeno.
+
+**Causa da posicao errada (so no palco):** existe uma regra generica e mais antiga, `.stage-screen .stage-stage strong { justify-self:center; width:100%; text-align:center; ... }`, criada para o timer gigante. Como o mini-timer tambem e um `<strong>` dentro do mesmo container, ele herdava `width:100%` e `text-align:center` dessa regra (maior especificidade que a regra generica `.stage-mini-timer`) — a caixa do mini-timer ficava esticada de ponta a ponta (embora com fundo transparente, invisivel) e o texto centralizado dentro dela, dando a impressao de estar no meio da tela em vez do canto.
+
+**Licao sobre a verificacao anterior:** a checagem automatizada da entrega original mediu `getBoundingClientRect()` do proprio elemento e confirmou `left:0`, o que e verdade — a CAIXA comecava em `x=0`. Mas a caixa tinha `width:100%` e o texto centralizado dentro dela, entao o texto visivel nao ficava no canto. Medir a posicao da caixa nao foi suficiente; o teste deveria ter conferido tambem `text-align`/`width` computados, ou a posicao do texto renderizado, nao so a borda do elemento.
+
+Correcao em `src/app/globals.css`:
+
+- `.stage-screen .stage-stage strong.stage-mini-timer` e `.stage-presentation.stage-preview strong.stage-mini-timer` ganharam `width:auto; text-align:left; justify-self:start;` explicitos, com especificidade suficiente para vencer a regra generica do timer gigante.
+- Tamanho aumentado nos dois contextos: palco de `clamp(1.5rem, 4vw, 3.5rem)` para `clamp(2rem, 5vw, 4.5rem)`; preview de `1.1rem` para `1.6rem`.
+
+Validacao: `lint`, `typecheck`, `test:db` (8/8) e `build` passaram. Verificado com Playwright: no palco, `boxLeft` e `miniLeft` iguais (0px) e `miniWidth` de apenas 195px (nao mais 100% da tela), `text-align:left` computado — confirma que agora e a caixa E o texto que ficam no canto, nao so a caixa. Screenshot confirma visualmente o mini-timer firme no canto superior esquerdo em ambas as telas, maior e legivel.
+
 ## Documentos ativos consultados
 
 - `docs/PRODUCT.md`, `docs/PROJECT-STATE.md`, `.sdd/knowledge/design-system.md`.

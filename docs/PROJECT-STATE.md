@@ -48,6 +48,7 @@
 - Mensagem (temporaria ou permanente) no palco e no preview agora mostra o timer pequeno no canto superior esquerdo, sem esconder o cronometro do bloco em andamento — comportamento que `docs/PRODUCT.md` ja descrevia mas ainda nao estava implementado assim. Ao remover a mensagem (expira ou e limpa manualmente), o timer grande volta ao normal. Evidencia em `.sdd/features/2026-09-01-timer-pequeno-com-mensagem/RECORD.md`.
 - Corrigido bug em que um unico bloco (ou um unico evento) esticava para ocupar a altura inteira do card em vez de ficar compacto (faltava `align-content:start` nas listas em grid). Reforcada no design system a regra de altura padrao dos controles (2.5rem sempre, exceto pedido explicito do usuario). Evidencia em `.sdd/features/2026-09-01-altura-bloco-unico/RECORD.md`.
 - Nome do bloco (timer) agora tem limite de 40 caracteres, no mesmo padrao ja usado para nome de evento (20) e mensagem (50): truncamento, aviso visivel e validacao no backend. Evidencia em `.sdd/features/2026-09-01-limite-nome-bloco/RECORD.md`.
+- Corrigido o mini-timer (exibido junto com mensagem ativa): no palco, ele aparecia centralizado no topo em vez de no canto esquerdo (herdava estilo de uma regra generica do timer gigante); em ambas as telas, o tamanho foi aumentado por estar pequeno demais. Evidencia (incluindo a causa raiz e a licao sobre a verificacao anterior) em `.sdd/features/2026-09-01-timer-pequeno-com-mensagem/RECORD.md`.
 
 ## Retomada obrigatoria da Rodada 5
 
