@@ -31,6 +31,17 @@ Antes de criar ou alterar qualquer elemento visual em `src/app/management-client
 - Linhas de lista (evento, bloco): `border-radius:.6rem`, padding `.5rem .7rem` a `.65rem .9rem` dependendo do contexto.
 - Cards/paineis: `border-radius:1rem`, padding `1rem`.
 - Rotulo tecnico ("eyebrow", ex. "EVENTO ABERTO"): fonte monoespacada (`"Courier New"`), maiusculas, `letter-spacing` largo.
+- Padding lateral da pagina (`.management-shell`): `padding-inline: clamp(.625rem, 2vw, 1.5rem)` — metade do padding vertical (`padding-block: clamp(1.25rem, 4vw, 3rem)`), para dar mais espaco horizontal aos cards.
+
+## Foco de inputs e botoes
+
+Nunca usar o `outline` padrao do navegador (fica grosso e escuro, destoa do resto do app). Padrao: `outline:none` no `:focus` normal, e um destaque discreto no `:focus-visible` usando a cor de acento teal (`#127c70`):
+
+```css
+input:focus, button:focus { outline:none; }
+input:focus-visible { outline:none; border-color:#127c70; box-shadow:0 0 0 3px #127c7026; }
+button:focus-visible { outline:none; box-shadow:0 0 0 3px #127c7040; }
+```
 
 ## Cards com altura fixa e rolagem interna
 
