@@ -371,15 +371,6 @@ export function ManagementClient() {
                   );
                 })}
               </div>
-              <form className="message-form" onSubmit={(event) => { event.preventDefault(); void sendMessage(false); }}>
-                <input value={messageText} onChange={(event) => onMessageTextChange(event.target.value)} placeholder="Mensagem para o palco" />
-                {messageLimitHit && <small className="message-limit-warning">Limite de 50 caracteres atingido.</small>}
-                <div className="message-actions">
-                  <button type="submit" title="Enviar mensagem temporaria, some sozinha apos 20 segundos">Temporaria</button>
-                  <button type="button" title="Enviar mensagem permanente, fica ate ser limpa" onClick={() => void sendMessage(true)}>Permanente</button>
-                  <button type="button" title="Limpar a mensagem do palco" onClick={() => void clearMessage()}>Limpar</button>
-                </div>
-              </form>
             </>
           ) : (
             <p>Crie ou selecione um evento para iniciar a preparacao.</p>
@@ -388,7 +379,18 @@ export function ManagementClient() {
         <section className="preview-panel">
           <p className="eyebrow">PREVIEW AO VIVO</p>
           <StagePresentation snapshot={snapshot} block={currentBlock} />
-          {active && <button className="clear-stage-button" onClick={() => void command("clear", undefined, true)}>Limpar palco</button>}
+          {active && (
+            <form className="message-form" onSubmit={(event) => { event.preventDefault(); void sendMessage(false); }}>
+              <input value={messageText} onChange={(event) => onMessageTextChange(event.target.value)} placeholder="Mensagem para o palco" />
+              {messageLimitHit && <small className="message-limit-warning">Limite de 50 caracteres atingido.</small>}
+              <div className="message-actions">
+                <button type="submit" title="Enviar mensagem temporaria, some sozinha apos 20 segundos">Temporaria</button>
+                <button type="button" title="Enviar mensagem permanente, fica ate ser limpa" onClick={() => void sendMessage(true)}>Permanente</button>
+                <button type="button" className="clear-message-button" title="Limpar a mensagem do palco" onClick={() => void clearMessage()}>Limpar</button>
+                <button type="button" className="clear-stage-button" onClick={() => void command("clear", undefined, true)}>Limpar palco</button>
+              </div>
+            </form>
+          )}
           <small>Versao {snapshot?.version ?? "-"} · {connection}</small>
         </section>
         <aside className="report-panel">
